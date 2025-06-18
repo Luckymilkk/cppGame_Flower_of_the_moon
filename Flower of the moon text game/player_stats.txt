@@ -1,0 +1,17 @@
+﻿# Начальные характеристики игрока
+hp:5
+maxHp:5
+steps:15
+inventorySlots:5
+attempts:3
+agility:2
+accuracy:0
+stamina:1
+intelligence:1
+combatExperience:2
+magicControl:2
+magicExperience:0
+psychicStability:0
+magicAccess:false
+magicReserve:2
+maxMagicReserve:2

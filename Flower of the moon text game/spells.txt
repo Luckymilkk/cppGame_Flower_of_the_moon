@@ -1,0 +1,45 @@
+# Заклинания. Каждое заклинание отделяется "---"
+# Сначала описываем заклинания для изучения (preparation_spell)
+name:Световой луч
+type:preparation_spell
+costSteps:1
+requiresMagicAccessToLearn:true
+---
+name:Ослепление
+type:preparation_spell
+costSteps:1
+requiresMagicAccessToLearn:true
+---
+name:Приручение
+type:preparation_spell
+costSteps:1
+requiresMagicAccessToLearn:true
+---
+# Затем описываем их боевые аналоги (battle_spell)
+# Имя (name) должно совпадать с preparation_spell, чтобы игра поняла, что это боевая версия изученного заклинания
+name:Световой луч
+type:battle_spell
+battleActionName:магический луч # Как будет называться в бою
+checkStat:magicControl
+damage:80
+manaCost:1
+instantWin:false
+requiresMagicAccessToUse:true
+---
+name:Ослепление
+type:battle_spell
+battleActionName:ослепление
+checkStat:magicExperience
+damage:0 # Урона нет, это instantWin
+manaCost:1
+instantWin:true
+requiresMagicAccessToUse:true
+---
+name:Приручение
+type:battle_spell
+battleActionName:приручение
+checkStat:psychicStability
+damage:0
+manaCost:1
+instantWin:true
+requiresMagicAccessToUse:true

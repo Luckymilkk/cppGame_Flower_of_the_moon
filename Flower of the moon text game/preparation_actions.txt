@@ -1,0 +1,72 @@
+# Действия в фазе подготовки. Каждое действие "---"
+menuText:Прокачать ловкость
+costSteps:1
+effectType:increase_stat
+targetStat:agility
+effectValue:1
+maxValue:3
+requiresMagicAccess:false # Не требует магии для прокачки
+---
+menuText:Прокачать меткость
+costSteps:1
+effectType:increase_stat
+targetStat:accuracy
+effectValue:1
+maxValue:3
+requiresMagicAccess:false
+---
+menuText:Прокачать выносливость
+costSteps:1
+effectType:increase_stat
+targetStat:stamina
+effectValue:1
+maxValue:3
+requiresMagicAccess:false
+---
+menuText:Прокачать ум
+costSteps:1
+effectType:increase_stat
+targetStat:intelligence
+effectValue:1
+maxValue:3
+requiresMagicAccess:false
+---
+menuText:Прокачать боевой опыт
+costSteps:1
+effectType:increase_stat
+targetStat:combatExperience
+effectValue:1
+maxValue:3
+requiresMagicAccess:false
+---
+menuText:Восстановить доступ к магии
+costSteps:1
+effectType:enable_magic_access
+targetStat: # не используется для этого типа
+effectValue:0 # не используется
+maxValue:0 # не используется
+requiresMagicAccess:false # само действие дает доступ
+---
+menuText:Прокачать контроль магии
+costSteps:1
+effectType:increase_stat
+targetStat:magicControl
+effectValue:1
+maxValue:3
+requiresMagicAccess:true # Требует доступа к магии
+---
+menuText:Прокачать магический опыт
+costSteps:1
+effectType:increase_stat
+targetStat:magicExperience
+effectValue:1
+maxValue:3
+requiresMagicAccess:true
+---
+menuText:Прокачать психическую стабильность
+costSteps:1
+effectType:increase_stat
+targetStat:psychicStability
+effectValue:1
+maxValue:3
+requiresMagicAccess:true
