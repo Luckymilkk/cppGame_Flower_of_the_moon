@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решен
 		data\DataLoader.h = data\DataLoader.h
 		engine\GameEngine.cpp = engine\GameEngine.cpp
 		engine\GameEngine.h = engine\GameEngine.h
+		main.cpp = main.cpp
 	EndProjectSection
 EndProject
 Global

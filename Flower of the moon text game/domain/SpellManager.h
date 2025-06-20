@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DOMAIN_SPELL_MANAGER_H_
+#define DOMAIN_SPELL_MANAGER_H_
+
 #include "Spell.h"
 #include <unordered_map>
 #include <string>
@@ -8,11 +10,13 @@ namespace domain {
 
 class SpellManager {
 public:
-    void addSpell(const Spell& spell);
-    const Spell* getSpell(const std::string& id) const;
-    std::vector<Spell> getAllSpells() const;
+    void AddSpell(const Spell& spell);
+    const Spell* GetSpell(const std::string& id) const;
+    std::vector<Spell> GetAllSpells() const;
 private:
-    std::unordered_map<std::string, Spell> spells;
+    std::unordered_map<std::string, Spell> spells_;
 };
 
 } // namespace domain 
+
+#endif  // DOMAIN_SPELL_MANAGER_H_ 

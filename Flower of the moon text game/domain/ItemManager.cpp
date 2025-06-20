@@ -3,24 +3,24 @@
 
 namespace domain {
 
-void ItemManager::addItem(const Item& item) {
+void ItemManager::AddItem(const Item& item) {
     if (item.id.empty()) {
         std::cerr << "Ошибка: попытка добавить предмет с пустым id! Имя предмета: " << item.name << std::endl;
         return;
     }
-    items[item.id] = item;
+    items_[item.id] = item;
 }
 
-const Item* ItemManager::getItem(const std::string& id) const {
-    auto it = items.find(id);
-    if (it != items.end()) {
+const Item* ItemManager::GetItem(const std::string& id) const {
+    auto it = items_.find(id);
+    if (it != items_.end()) {
         return &it->second;
     }
     return nullptr;
 }
 
-const Item* ItemManager::findItemByName(const std::string& name) const {
-    for (const auto& pair : items) {
+const Item* ItemManager::FindItemByName(const std::string& name) const {
+    for (const auto& pair : items_) {
         if (pair.second.name == name) {
             return &pair.second;
         }
@@ -28,9 +28,9 @@ const Item* ItemManager::findItemByName(const std::string& name) const {
     return nullptr;
 }
 
-std::vector<Item> ItemManager::getAllItems() const {
+std::vector<Item> ItemManager::GetAllItems() const {
     std::vector<Item> result;
-    for (const auto& pair : items) {
+    for (const auto& pair : items_) {
         result.push_back(pair.second);
     }
     return result;

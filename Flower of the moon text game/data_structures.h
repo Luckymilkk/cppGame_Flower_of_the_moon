@@ -1,140 +1,155 @@
-﻿#pragma once
-#ifndef DATA_STRUCTURES_H
-#define DATA_STRUCTURES_H
+﻿#ifndef DATA_STRUCTURES_H_
+#define DATA_STRUCTURES_H_
 
 #include <string>
 #include <vector>
 #include <map>
-#include <memory> // для std::unique_ptr
+#include <memory>
 #include "domain/ItemManager.h"
+#include "domain/BookManager.h"
+#include "domain/Player.h"
 #include "domain/Action.h"
 // НЕ НУЖНЫ здесь: <iostream>, <iomanip>, <algorithm> для реализаций, они уйдут в .cpp
 
-// --- Структуры для хранения данных ---
-
+/**
+ * @brief Player statistics and inventory.
+ */
 struct PlayerStats {
     int hp = 100;
-    int maxHp = 100;
+    int max_hp = 100;
     int steps = 10;
-    int inventorySlots = 3;
-    int attempts;
+    int inventory_slots = 3;
+    int attempts = 0;
 
-    int agility;
-    int accuracy;
-    int stamina;
+    int agility = 0;
+    int accuracy = 0;
+    int stamina = 0;
     int intelligence = 0;
-    int combatExperience;
-    int magicControl;
-    int magicExperience;
-    int psychicStability;
+    int combat_experience = 0;
+    int magic_control = 0;
+    int magic_experience = 0;
+    int psychic_stability = 0;
 
-    bool magicAccess = false;
-    int magicReserve = 50;
-    int maxMagicReserve = 50;
+    bool magic_access = false;
+    int magic_reserve = 50;
+    int max_magic_reserve = 50;
 
     std::vector<std::string> inventory;
-    std::vector<std::string> knownSpells;
-    std::map<std::string, bool> booksActuallyRead;
-    int rifleUsesPerBattle = 0;
+    std::vector<std::string> known_spells;
+    std::map<std::string, bool> books_actually_read;
+    int rifle_uses_per_battle = 0;
 
-    PlayerStats(); // Конструктор может остаться inline, если он простой, или тоже вынесен
-
-    // ОБЪЯВЛЕНИЯ методов
-    void displayStats(const domain::ItemManager& itemManager) const;
-    void resetForNewAttempt(const PlayerStats& initialConfig);
-    bool hasItem(const std::string& itemName) const;
-    bool knowsSpell(const std::string& spellName) const;
+    PlayerStats();
+    void DisplayStats(const domain::ItemManager& item_manager) const;
+    void ResetForNewAttempt(const PlayerStats& initial_config);
+    bool HasItem(const std::string& item_name) const;
+    bool KnowsSpell(const std::string& spell_name) const;
 };
 
+/**
+ * @brief Monster data and battle properties.
+ */
 struct MonsterData {
+    std::string id;
     std::string name;
-    int initialHp;
-    int currentHp;
-    int damageToPlayer;
-    std::string bookKey;
-    std::vector<std::string> favorableActions;
-    std::vector<std::string> unfavorableActions;
-    std::vector<std::string> neutralActions;
-    std::string specialRule;
+    int initial_hp = 0;
+    int current_hp = 0;
+    int attack = 0;
+    int defense = 0;
+    int damage_to_player = 0;
+    std::string book_key;
+    std::vector<std::string> favorable_actions;
+    std::vector<std::string> unfavorable_actions;
+    std::vector<std::string> neutral_actions;
+    std::string special_rule;
 
-    MonsterData(); // Конструктор
-
-    // ОБЪЯВЛЕНИЯ методов
-    void displayInfo(const PlayerStats& player, const std::map<std::string, std::string>& bookContents) const;
-    double getActionCoefficient(const std::string& actionName) const;
-    void resetHp();
+    MonsterData();
+    void DisplayInfo(const domain::Player& player, const domain::BookManager& book_manager) const;
+    double GetActionCoefficient(const std::string& action_name) const;
+    void ResetHp();
 };
 
+/**
+ * @brief Item data and properties.
+ */
 struct ItemData {
-    std::string id;      // Уникальный идентификатор предмета
-    std::string name;    // Отображаемое имя предмета
-    std::string type;
-    int costSteps;
-    int costSlots;
-    std::string prepEffectType;
-    int prepEffectValue;
-    std::string battleActionName;
-    std::string checkStat;
-    int damage;
-    int usesPerBattle;
-    std::string bookKey;
-
-    ItemData(); // Конструктор
-};
-
-struct SpellData {
-    // ... (содержимое SpellData как было) ...
+    std::string id;
     std::string name;
     std::string type;
-    int costSteps;
-    bool requiresMagicAccessToLearn;
-    std::string battleActionName;
-    std::string checkStat;
-    int damage;
-    int manaCost;
-    bool instantWin;
-    bool requiresMagicAccessToUse;
+    int cost_steps = 0;
+    int cost_slots = 0;
+    std::string prep_effect_type;
+    int prep_effect_value = 0;
+    std::string battle_action_name;
+    std::string check_stat;
+    int damage = 0;
+    int uses_per_battle = 0;
+    std::string book_key;
 
-    SpellData(); // Конструктор
+    ItemData();
 };
 
+/**
+ * @brief Spell data and properties.
+ */
+struct SpellData {
+    std::string name;
+    std::string type;
+    int cost_steps = 0;
+    bool requires_magic_access_to_learn = false;
+    std::string battle_action_name;
+    std::string check_stat;
+    int damage = 0;
+    int mana_cost = 0;
+    bool instant_win = false;
+    bool requires_magic_access_to_use = false;
+
+    SpellData();
+};
+
+/**
+ * @brief Preparation action data and properties.
+ */
 struct PreparationActionData {
-    // ... (содержимое PreparationActionData как было) ...
-    std::string menuText;
-    int costSteps;
-    std::string effectType;
-    std::string targetStat;
-    int effectValue;
-    int maxValue;
-    bool requiresMagicAccess;
+    std::string menu_text;
+    int cost_steps = 0;
+    std::string effect_type;
+    std::string target_stat;
+    int effect_value = 0;
+    int max_value = 0;
+    bool requires_magic_access = false;
+    std::string requires_book;
+    std::string book_key;
 
-    PreparationActionData(); // Конструктор
+    PreparationActionData();
 };
 
+/**
+ * @brief Game data container.
+ */
 struct GameData {
-    PlayerStats initialPlayerStats;
+    PlayerStats initial_player_stats;
     std::vector<MonsterData> monsters;
     std::vector<ItemData> items;
     std::vector<SpellData> spells;
-    std::map<std::string, std::string> bookContents;
-    std::vector<PreparationActionData> preparationActions;
+    std::map<std::string, std::string> book_contents;
+    std::vector<PreparationActionData> preparation_actions;
 
     struct BattleActionInfo {
         std::string name;
-        std::string checkStat;
-        int damage;
-        int manaCost;
-        bool isInstantWin;
-        bool isSpell;
-        bool isWeapon;
-        int weaponUsesTotal;
-        std::string originalItemName;
+        std::string check_stat;
+        int damage = 0;
+        int mana_cost = 0;
+        bool is_instant_win = false;
+        bool is_spell = false;
+        bool is_weapon = false;
+        int weapon_uses_total = 0;
+        std::string original_item_name;
     };
 
-    // ОБЪЯВЛЕНИЯ методов
-    const ItemData* findItem(const std::string& itemId) const;
-    const SpellData* findSpell(const std::string& name) const;
-    std::unique_ptr<BattleActionInfo> findBattleActionDetails(const PlayerStats& player, const std::string& actionDisplayName) const;
+    const ItemData* FindItem(const std::string& item_id) const;
+    const SpellData* FindSpell(const std::string& name) const;
+    std::unique_ptr<BattleActionInfo> FindBattleActionDetails(const PlayerStats& player, const std::string& action_display_name) const;
 };
 
-#endif // DATA_STRUCTURES_H
+#endif  // DATA_STRUCTURES_H_

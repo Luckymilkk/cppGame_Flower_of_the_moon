@@ -16,7 +16,6 @@ int main() {
     std::locale::global(std::locale("ru_RU.UTF-8"));
 
     std::ifstream file("test.txt");
-    file.imbue(std::locale(std::locale(), new std::codecvt_utf8<char>));
     std::string line;
     while (std::getline(file, line)) {
         std::cout << line << std::endl;

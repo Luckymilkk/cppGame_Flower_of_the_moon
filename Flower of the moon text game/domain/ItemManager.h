@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DOMAIN_ITEM_MANAGER_H_
+#define DOMAIN_ITEM_MANAGER_H_
+
 #include "Item.h"
 #include <unordered_map>
 #include <string>
@@ -8,12 +10,14 @@ namespace domain {
 
 class ItemManager {
 public:
-    void addItem(const Item& item);
-    const Item* getItem(const std::string& id) const;
-    const Item* findItemByName(const std::string& name) const;
-    std::vector<Item> getAllItems() const;
+    void AddItem(const Item& item);
+    const Item* GetItem(const std::string& id) const;
+    const Item* FindItemByName(const std::string& name) const;
+    std::vector<Item> GetAllItems() const;
 private:
-    std::unordered_map<std::string, Item> items;
+    std::unordered_map<std::string, Item> items_;
 };
 
 } // namespace domain
+
+#endif  // DOMAIN_ITEM_MANAGER_H_

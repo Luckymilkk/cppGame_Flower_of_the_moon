@@ -2,21 +2,21 @@
 
 namespace domain {
 
-void ActionManager::addAction(const Action& action) {
-    actions[action.id] = action;
+void ActionManager::AddAction(const Action& action) {
+    actions_[action.id] = action;
 }
 
-const Action* ActionManager::getAction(const std::string& id) const {
-    auto it = actions.find(id);
-    if (it != actions.end()) {
+const Action* ActionManager::GetAction(const std::string& id) const {
+    auto it = actions_.find(id);
+    if (it != actions_.end()) {
         return &it->second;
     }
     return nullptr;
 }
 
-std::vector<Action> ActionManager::getAllActions() const {
+std::vector<Action> ActionManager::GetAllActions() const {
     std::vector<Action> result;
-    for (const auto& pair : actions) {
+    for (const auto& pair : actions_) {
         result.push_back(pair.second);
     }
     return result;

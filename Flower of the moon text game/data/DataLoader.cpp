@@ -17,12 +17,12 @@ bool DataLoader::loadItems(const std::string& filename, domain::ItemManager& man
         domain::Item currentItem;
         std::string line;
         while (std::getline(file, line)) {
-            line = trimString(line);
+            line = TrimString(line);
             if (line.empty() || line[0] == '#') continue;
 
             if (line == "---") {
                 if (!currentItem.name.empty()) {
-                    manager.addItem(currentItem);
+                    manager.AddItem(currentItem);
                     currentItem = domain::Item();
                 }
                 continue;
@@ -31,8 +31,8 @@ bool DataLoader::loadItems(const std::string& filename, domain::ItemManager& man
             auto delimiterPos = line.find(":");
             if (delimiterPos == std::string::npos) continue;
             
-            std::string key = trimString(line.substr(0, delimiterPos));
-            std::string value = trimString(line.substr(delimiterPos + 1));
+            std::string key = TrimString(line.substr(0, delimiterPos));
+            std::string value = TrimString(line.substr(delimiterPos + 1));
 
             if (key == "name") currentItem.name = value;
             else if (key == "description") currentItem.description = value;
@@ -51,7 +51,7 @@ bool DataLoader::loadItems(const std::string& filename, domain::ItemManager& man
         }
 
         if (!currentItem.name.empty()) {
-            manager.addItem(currentItem);
+            manager.AddItem(currentItem);
         }
 
         file.close();
@@ -75,12 +75,12 @@ bool DataLoader::loadMonsters(const std::string& filename, domain::MonsterManage
         domain::Monster currentMonster;
         std::string line;
         while (std::getline(file, line)) {
-            line = trimString(line);
+            line = TrimString(line);
             if (line.empty() || line[0] == '#') continue;
 
             if (line == "---") {
                 if (!currentMonster.name.empty()) {
-                    manager.addMonster(currentMonster);
+                    manager.AddMonster(currentMonster);
                     currentMonster = domain::Monster();
                 }
                 continue;
@@ -89,8 +89,8 @@ bool DataLoader::loadMonsters(const std::string& filename, domain::MonsterManage
             auto delimiterPos = line.find(":");
             if (delimiterPos == std::string::npos) continue;
             
-            std::string key = trimString(line.substr(0, delimiterPos));
-            std::string value = trimString(line.substr(delimiterPos + 1));
+            std::string key = TrimString(line.substr(0, delimiterPos));
+            std::string value = TrimString(line.substr(delimiterPos + 1));
 
             if (key == "name") currentMonster.name = value;
             else if (key == "health") currentMonster.health = std::stoi(value);
@@ -101,14 +101,14 @@ bool DataLoader::loadMonsters(const std::string& filename, domain::MonsterManage
                 std::istringstream ss(value);
                 std::string action;
                 while (std::getline(ss, action, ',')) {
-                    currentMonster.favorableActions.push_back(trimString(action));
+                    currentMonster.favorableActions.push_back(TrimString(action));
                 }
             }
             else if (key == "unfavorableActions") {
                 std::istringstream ss(value);
                 std::string action;
                 while (std::getline(ss, action, ',')) {
-                    currentMonster.unfavorableActions.push_back(trimString(action));
+                    currentMonster.unfavorableActions.push_back(TrimString(action));
                 }
             }
             else if (key == "neutralActions") {
@@ -116,14 +116,14 @@ bool DataLoader::loadMonsters(const std::string& filename, domain::MonsterManage
                 std::string action;
                 while (std::getline(ss, action, ',')) {
                     if (!action.empty()) {
-                        currentMonster.neutralActions.push_back(trimString(action));
+                        currentMonster.neutralActions.push_back(TrimString(action));
                     }
                 }
             }
         }
 
         if (!currentMonster.name.empty()) {
-            manager.addMonster(currentMonster);
+            manager.AddMonster(currentMonster);
         }
 
         file.close();
@@ -147,12 +147,12 @@ bool DataLoader::loadSpells(const std::string& filename, domain::SpellManager& m
         domain::Spell currentSpell;
         std::string line;
         while (std::getline(file, line)) {
-            line = trimString(line);
+            line = TrimString(line);
             if (line.empty() || line[0] == '#') continue;
 
             if (line == "---") {
                 if (!currentSpell.name.empty()) {
-                    manager.addSpell(currentSpell);
+                    manager.AddSpell(currentSpell);
                     currentSpell = domain::Spell();
                 }
                 continue;
@@ -161,8 +161,8 @@ bool DataLoader::loadSpells(const std::string& filename, domain::SpellManager& m
             auto delimiterPos = line.find(":");
             if (delimiterPos == std::string::npos) continue;
             
-            std::string key = trimString(line.substr(0, delimiterPos));
-            std::string value = trimString(line.substr(delimiterPos + 1));
+            std::string key = TrimString(line.substr(0, delimiterPos));
+            std::string value = TrimString(line.substr(delimiterPos + 1));
 
             if (key == "name") currentSpell.name = value;
             else if (key == "id") currentSpell.id = value;
@@ -174,7 +174,7 @@ bool DataLoader::loadSpells(const std::string& filename, domain::SpellManager& m
         }
 
         if (!currentSpell.name.empty()) {
-            manager.addSpell(currentSpell);
+            manager.AddSpell(currentSpell);
         }
 
         file.close();
@@ -198,12 +198,12 @@ bool DataLoader::loadBooks(const std::string& filename, domain::BookManager& man
         domain::Book currentBook;
         std::string line;
         while (std::getline(file, line)) {
-            line = trimString(line);
+            line = TrimString(line);
             if (line.empty() || line[0] == '#') continue;
 
             if (line == "---") {
                 if (!currentBook.title.empty()) {
-                    manager.addBook(currentBook);
+                    manager.AddBook(currentBook);
                     currentBook = domain::Book();
                 }
                 continue;
@@ -212,8 +212,8 @@ bool DataLoader::loadBooks(const std::string& filename, domain::BookManager& man
             auto delimiterPos = line.find(":");
             if (delimiterPos == std::string::npos) continue;
             
-            std::string key = trimString(line.substr(0, delimiterPos));
-            std::string value = trimString(line.substr(delimiterPos + 1));
+            std::string key = TrimString(line.substr(0, delimiterPos));
+            std::string value = TrimString(line.substr(delimiterPos + 1));
 
             if (key == "title") currentBook.title = value;
             else if (key == "id") currentBook.id = value;
@@ -221,7 +221,7 @@ bool DataLoader::loadBooks(const std::string& filename, domain::BookManager& man
         }
 
         if (!currentBook.title.empty()) {
-            manager.addBook(currentBook);
+            manager.AddBook(currentBook);
         }
 
         file.close();
@@ -245,12 +245,12 @@ bool DataLoader::loadActions(const std::string& filename, domain::ActionManager&
         domain::Action currentAction;
         std::string line;
         while (std::getline(file, line)) {
-            line = trimString(line);
+            line = TrimString(line);
             if (line.empty() || line[0] == '#') continue;
 
             if (line == "---") {
                 if (!currentAction.name.empty()) {
-                    manager.addAction(currentAction);
+                    manager.AddAction(currentAction);
                     currentAction = domain::Action();
                 }
                 continue;
@@ -259,8 +259,8 @@ bool DataLoader::loadActions(const std::string& filename, domain::ActionManager&
             auto delimiterPos = line.find(":");
             if (delimiterPos == std::string::npos) continue;
             
-            std::string key = trimString(line.substr(0, delimiterPos));
-            std::string value = trimString(line.substr(delimiterPos + 1));
+            std::string key = TrimString(line.substr(0, delimiterPos));
+            std::string value = TrimString(line.substr(delimiterPos + 1));
 
             if (key == "name") currentAction.name = value;
             else if (key == "id") currentAction.id = value;
@@ -277,7 +277,7 @@ bool DataLoader::loadActions(const std::string& filename, domain::ActionManager&
         }
 
         if (!currentAction.name.empty()) {
-            manager.addAction(currentAction);
+            manager.AddAction(currentAction);
         }
 
         file.close();
@@ -300,36 +300,42 @@ bool DataLoader::loadPlayer(const std::string& filename, domain::Player& player)
     try {
         std::string line;
         while (std::getline(file, line)) {
-            line = trimString(line);
+            line = TrimString(line);
             if (line.empty() || line[0] == '#') continue;
 
             auto delimiterPos = line.find(":");
             if (delimiterPos == std::string::npos) continue;
             
-            std::string key = trimString(line.substr(0, delimiterPos));
-            std::string value = trimString(line.substr(delimiterPos + 1));
+            std::string key = TrimString(line.substr(0, delimiterPos));
+            std::string value = TrimString(line.substr(delimiterPos + 1));
 
             if (key == "name") player.name = value;
             else if (key == "health") player.health = std::stoi(value);
-            else if (key == "maxHealth") player.maxHealth = std::stoi(value);
+            else if (key == "max_health") player.max_health = std::stoi(value);
             else if (key == "mana") player.mana = std::stoi(value);
-            else if (key == "magicReserve") player.magicReserve = std::stoi(value);
-            else if (key == "maxMagicReserve") player.maxMagicReserve = std::stoi(value);
+            else if (key == "magic_reserve") player.magic_reserve = std::stoi(value);
+            else if (key == "max_magic_reserve") player.max_magic_reserve = std::stoi(value);
             else if (key == "experience") player.experience = std::stoi(value);
             else if (key == "level") player.level = std::stoi(value);
             else if (key == "steps") player.steps = std::stoi(value);
-            else if (key == "inventorySlots") player.inventorySlots = std::stoi(value);
+            else if (key == "inventory_slots") player.inventory_slots = std::stoi(value);
             else if (key == "attempts") player.attempts = std::stoi(value);
-            else if (key == "magicAccess") player.magicAccess = (value == "true" || value == "1");
-            // Характеристики
+            else if (key == "magic_access") player.magic_access = (value == "true" || value == "1");
             else if (key == "agility") player.agility = std::stoi(value);
             else if (key == "accuracy") player.accuracy = std::stoi(value);
             else if (key == "stamina") player.stamina = std::stoi(value);
             else if (key == "intelligence") player.intelligence = std::stoi(value);
-            else if (key == "combatExperience") player.combatExperience = std::stoi(value);
-            else if (key == "magicControl") player.magicControl = std::stoi(value);
-            else if (key == "magicExperience") player.magicExperience = std::stoi(value);
-            else if (key == "psychicStability") player.psychicStability = std::stoi(value);
+            else if (key == "combat_experience") player.combat_experience = std::stoi(value);
+            else if (key == "magic_control") player.magic_control = std::stoi(value);
+            else if (key == "magic_experience") player.magic_experience = std::stoi(value);
+            else if (key == "psychic_stability") player.psychic_stability = std::stoi(value);
+            else if (key == "inventory") {
+                std::istringstream ss(value);
+                std::string item;
+                while (std::getline(ss, item, ',')) {
+                    // ... существующий код ...
+                }
+            }
         }
 
         file.close();

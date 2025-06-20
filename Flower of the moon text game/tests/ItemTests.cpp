@@ -11,6 +11,6 @@ TEST(ItemTest, FieldsAndUse) {
     EXPECT_EQ(item.name, "Меч");
     EXPECT_EQ(item.description, "Острый меч");
     EXPECT_EQ(item.effects["damage"], 10);
-    // use() пока не реализует логику, просто вызывается
-    item.use();
+    // Use() пока не реализует логику, просто вызывается
+    item.Use();
 } 

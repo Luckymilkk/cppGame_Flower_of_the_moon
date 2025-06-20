@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DOMAIN_PLAYER_H_
+#define DOMAIN_PLAYER_H_
+
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -9,75 +11,49 @@ namespace domain {
 
 class Player {
 public:
-    // Конструктор с инициализацией значений по умолчанию
-    Player() : 
-        health(100),
-        maxHealth(100),
-        mana(50),
-        magicReserve(50),
-        maxMagicReserve(50),
-        experience(0),
-        level(1),
-        steps(15),
-        inventorySlots(5),
-        attempts(0),
-        magicAccess(false),
-        agility(2),
-        accuracy(0),
-        stamina(1),
-        intelligence(1),
-        combatExperience(2),
-        magicControl(2),
-        magicExperience(0),
-        psychicStability(0),
-        rifleUsesPerBattle(0)
-    {}
+    Player();
 
-    // Базовые характеристики
     std::string name;
     int health;
-    int maxHealth;
+    int max_health;
     int mana;
-    int magicReserve;
-    int maxMagicReserve;
+    int magic_reserve;
+    int max_magic_reserve;
     int experience;
     int level;
     int steps;
-    int inventorySlots;
+    int inventory_slots;
     int attempts;
-    bool magicAccess;
+    bool magic_access;
 
-    // Характеристики персонажа
     int agility;
     int accuracy;
     int stamina;
     int intelligence;
-    int combatExperience;
-    int magicControl;
-    int magicExperience;
-    int psychicStability;
+    int combat_experience;
+    int magic_control;
+    int magic_experience;
+    int psychic_stability;
 
-    // Коллекции
     std::unordered_map<std::string, int> stats;
     std::vector<std::string> inventory;
-    std::vector<std::string> knownSpells;
-    std::map<std::string, bool> booksActuallyRead;
-    int rifleUsesPerBattle;
+    std::vector<std::string> known_spells;
+    std::map<std::string, bool> books_actually_read;
+    int rifle_uses_per_battle;
 
-    // Методы для управления игроком
-    void addItem(const std::string& itemId);
-    void removeItem(const std::string& itemId);
-    void takeDamage(int amount);
-    void heal(int amount);
-    void displayStats(const ItemManager& itemManager) const;
-    void resetForNewAttempt(const Player& initialConfig);
-    bool hasItem(const std::string& itemId) const;
-    bool knowsSpell(const std::string& spellName) const;
-    
-    // Новые методы для работы с характеристиками
-    int getStatValue(const std::string& statName) const;
-    void modifyStat(const std::string& statName, int value, int maxValue);
-    int getUsedInventorySlots(const ItemManager& itemManager) const;
+    void AddItem(const std::string& item_id);
+    void RemoveItem(const std::string& item_id);
+    void TakeDamage(int amount);
+    void Heal(int amount);
+    void DisplayStats(const ItemManager& item_manager) const;
+    void ResetForNewAttempt(const Player& initial_config);
+    bool HasItem(const std::string& item_id) const;
+    bool KnowsSpell(const std::string& spell_name) const;
+    int GetStatValue(const std::string& stat_name) const;
+    void ModifyStat(const std::string& stat_name, int value, int max_value);
+    int GetUsedInventorySlots(const ItemManager& item_manager) const;
 };
 
-} // namespace domain 
+}  // namespace domain
+
+#endif  // DOMAIN_PLAYER_H_ 

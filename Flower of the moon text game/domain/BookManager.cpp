@@ -2,21 +2,21 @@
 
 namespace domain {
 
-void BookManager::addBook(const Book& book) {
-    books[book.id] = book;
+void BookManager::AddBook(const Book& book) {
+    books_[book.id] = book;
 }
 
-const Book* BookManager::getBook(const std::string& id) const {
-    auto it = books.find(id);
-    if (it != books.end()) {
+const Book* BookManager::GetBook(const std::string& id) const {
+    auto it = books_.find(id);
+    if (it != books_.end()) {
         return &it->second;
     }
     return nullptr;
 }
 
-std::vector<Book> BookManager::getAllBooks() const {
+std::vector<Book> BookManager::GetAllBooks() const {
     std::vector<Book> result;
-    for (const auto& pair : books) {
+    for (const auto& pair : books_) {
         result.push_back(pair.second);
     }
     return result;

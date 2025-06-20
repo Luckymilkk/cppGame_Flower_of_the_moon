@@ -11,6 +11,6 @@ TEST(ActionTest, FieldsAndExecute) {
     EXPECT_EQ(action.name, "Тренировка");
     EXPECT_EQ(action.description, "Увеличивает ловкость");
     EXPECT_EQ(action.effects["agility"], 1);
-    // execute() пока не реализует логику, просто вызывается
-    action.execute();
+    // Execute() пока не реализует логику, просто вызывается
+    action.Execute();
 } 

@@ -3,31 +3,18 @@
 #include <iomanip>            // Для std::setprecision, std::fixed
 #include <algorithm>          // Для std::find
 #include <memory>             // Для std::make_unique (если используется в findBattleActionDetails)
+#include "domain/Book.h"       // Нужно для доступа к content
 
-// --- Конструкторы (если были вынесены, или для инициализации по умолчанию) ---
-PlayerStats::PlayerStats() : hp(0), maxHp(0), steps(0), inventorySlots(0), attempts(0),
-agility(0), accuracy(0), stamina(0), intelligence(0), combatExperience(0),
-magicControl(0), magicExperience(0), psychicStability(0),
-magicAccess(false), magicReserve(0), maxMagicReserve(0), rifleUsesPerBattle(0) {
-}
+// --- PlayerStats ---
+PlayerStats::PlayerStats() = default;
 
-MonsterData::MonsterData() : initialHp(0), currentHp(0), damageToPlayer(0) {}
-
-ItemData::ItemData() : costSteps(0), costSlots(0), prepEffectValue(0), damage(0), usesPerBattle(0) {}
-
-SpellData::SpellData() : costSteps(0), requiresMagicAccessToLearn(false), damage(0), manaCost(0), instantWin(false), requiresMagicAccessToUse(false) {}
-
-PreparationActionData::PreparationActionData() : costSteps(0), effectValue(0), maxValue(0), requiresMagicAccess(false) {}
-
-
-// --- Реализации методов PlayerStats ---
-void PlayerStats::displayStats(const domain::ItemManager& itemManager) const {
+void PlayerStats::DisplayStats(const domain::ItemManager& item_manager) const {
     std::cout << "\n=== СТАТИСТИКА ИГРОКА ===" << std::endl;
-    std::cout << "Здоровье: " << hp << "/" << maxHp << std::endl;
-    if (magicAccess) {
-        std::cout << "Магический резерв: " << magicReserve << "/" << maxMagicReserve << std::endl;
+    std::cout << "Здоровье: " << hp << "/" << max_hp << std::endl;
+    if (magic_access) {
+        std::cout << "Магический резерв: " << magic_reserve << "/" << max_magic_reserve << std::endl;
     }
-    std::cout << "Боевой опыт: " << combatExperience << std::endl;
+    std::cout << "Боевой опыт: " << combat_experience << std::endl;
     std::cout << "Выносливость: " << stamina << std::endl;
     std::cout << "Ум: " << intelligence << std::endl;
     std::cout << "\nИнвентарь:" << std::endl;
@@ -35,165 +22,168 @@ void PlayerStats::displayStats(const domain::ItemManager& itemManager) const {
         std::cout << "Пусто" << std::endl;
     }
     else {
-        for (const auto& itemId : inventory) {
-            const auto* item = itemManager.getItem(itemId);
+        for (const auto& item_id : inventory) {
+            const auto* item = item_manager.GetItem(item_id);
             if (item) {
                 std::cout << "- " << item->name << std::endl;
             }
         }
     }
     std::cout << "\nИзвестные заклинания:" << std::endl;
-    if (knownSpells.empty()) {
+    if (known_spells.empty()) {
         std::cout << "Нет" << std::endl;
     }
     else {
-        for (const auto& spell : knownSpells) {
+        for (const auto& spell : known_spells) {
             std::cout << "- " << spell << std::endl;
         }
     }
     std::cout << "=========================" << std::endl;
 }
 
-void PlayerStats::resetForNewAttempt(const PlayerStats& initialConfig) {
-    // Восстанавливаем HP и ману до ИЗНАЧАЛЬНЫХ максимальных значений
-    hp = initialConfig.maxHp;
-    maxHp = initialConfig.maxHp;
-    magicReserve = initialConfig.maxMagicReserve;
-    maxMagicReserve = initialConfig.maxMagicReserve;
-
-    // Также сбрасываем временные боевые состояния
-    rifleUsesPerBattle = 0;
+void PlayerStats::ResetForNewAttempt(const PlayerStats& initial_config) {
+    hp = initial_config.max_hp;
+    max_hp = initial_config.max_hp;
+    magic_reserve = initial_config.max_magic_reserve;
+    max_magic_reserve = initial_config.max_magic_reserve;
+    rifle_uses_per_battle = 0;
 }
 
-bool PlayerStats::hasItem(const std::string& itemName) const {
-    return std::find(inventory.begin(), inventory.end(), itemName) != inventory.end();
+bool PlayerStats::HasItem(const std::string& item_name) const {
+    return std::find(inventory.begin(), inventory.end(), item_name) != inventory.end();
 }
 
-bool PlayerStats::knowsSpell(const std::string& spellName) const {
-    return std::find(knownSpells.begin(), knownSpells.end(), spellName) != knownSpells.end();
+bool PlayerStats::KnowsSpell(const std::string& spell_name) const {
+    return std::find(known_spells.begin(), known_spells.end(), spell_name) != known_spells.end();
 }
 
-// --- Реализации методов MonsterData ---
-void MonsterData::displayInfo(const PlayerStats& player, const std::map<std::string, std::string>& bookContentsMap) const {
+// --- MonsterData ---
+MonsterData::MonsterData() = default;
+
+void MonsterData::DisplayInfo(const domain::Player& player, const domain::BookManager& book_manager) const {
     std::cout << "\n--- Противник: " << name << " ---" << std::endl;
-    bool bookWasReadByPlayer = false;
-    auto bookIt = player.booksActuallyRead.find(bookKey); // bookKey - это имя книги, например "книга о волках"
-    if (bookIt != player.booksActuallyRead.end() && bookIt->second) {
-        bookWasReadByPlayer = true;
+    bool book_was_read_by_player = false;
+    auto book_it = player.books_actually_read.find(book_key);
+    if (book_it != player.books_actually_read.end() && book_it->second) {
+        book_was_read_by_player = true;
     }
 
-    if (bookWasReadByPlayer) {
-        auto contentIt = bookContentsMap.find(bookKey); // Ищем содержимое по тому же ключу
-        if (contentIt != bookContentsMap.end()) {
-            std::cout << contentIt->second << std::endl;
+    if (book_was_read_by_player) {
+        const auto* book = book_manager.GetBook(book_key);
+        if (book) {
+            std::cout << book->content << std::endl;
         }
-        std::cout << "Здоровье: " << currentHp << "/" << initialHp << std::endl;
+        std::cout << "Здоровье: " << current_hp << "/" << initial_hp << std::endl;
     }
     else {
         std::cout << "Информация о монстре скрыта (прочитайте соответствующую книгу)." << std::endl;
-        std::cout << "Здоровье: " << currentHp << "/" << initialHp << std::endl; // HP показываем всегда
     }
     std::cout << "--------------------------" << std::endl;
 }
 
-double MonsterData::getActionCoefficient(const std::string& actionName) const {
-    if (std::find(favorableActions.begin(), favorableActions.end(), actionName) != favorableActions.end()) {
+double MonsterData::GetActionCoefficient(const std::string& action_name) const {
+    if (std::find(favorable_actions.begin(), favorable_actions.end(), action_name) != favorable_actions.end()) {
         return 2.0;
     }
-    if (std::find(unfavorableActions.begin(), unfavorableActions.end(), actionName) != unfavorableActions.end()) {
+    if (std::find(unfavorable_actions.begin(), unfavorable_actions.end(), action_name) != unfavorable_actions.end()) {
         return 0.5;
     }
-    if (std::find(neutralActions.begin(), neutralActions.end(), actionName) != neutralActions.end()) {
+    if (std::find(neutral_actions.begin(), neutral_actions.end(), action_name) != neutral_actions.end()) {
         return 1.0;
     }
-    // У Кентавра особое правило, обрабатывается здесь
-    if (specialRule == "AllOthersUnfavorable" &&
-        std::find(favorableActions.begin(), favorableActions.end(), actionName) == favorableActions.end() &&
-        std::find(neutralActions.begin(), neutralActions.end(), actionName) == neutralActions.end()) {
+    if (special_rule == "AllOthersUnfavorable" &&
+        std::find(favorable_actions.begin(), favorable_actions.end(), action_name) == favorable_actions.end() &&
+        std::find(neutral_actions.begin(), neutral_actions.end(), action_name) == neutral_actions.end()) {
         return 0.5;
     }
-    return 1.0; // По умолчанию нейтрально, если не найдено в списках и нет спец. правила
+    return 1.0;
 }
 
-void MonsterData::resetHp() {
-    currentHp = initialHp;
+void MonsterData::ResetHp() {
+    current_hp = initial_hp;
 }
 
-// --- Реализации методов GameData ---
-const ItemData* GameData::findItem(const std::string& itemId) const {
+// --- ItemData ---
+ItemData::ItemData() = default;
+
+// --- SpellData ---
+SpellData::SpellData() = default;
+
+// --- PreparationActionData ---
+PreparationActionData::PreparationActionData() = default;
+
+// --- GameData ---
+const ItemData* GameData::FindItem(const std::string& item_id) const {
     for (const auto& item : items) {
-        if (item.id == itemId) {
+        if (item.id == item_id) {
             return &item;
         }
     }
     return nullptr;
 }
 
-const SpellData* GameData::findSpell(const std::string& name) const {
+const SpellData* GameData::FindSpell(const std::string& name) const {
     for (const auto& spell : spells) {
         if (spell.name == name) return &spell;
     }
     return nullptr;
 }
 
-std::unique_ptr<GameData::BattleActionInfo> GameData::findBattleActionDetails(const PlayerStats& player, const std::string& actionDisplayName) const {
-    // Поиск среди оружия в инвентаре
-    for (const auto& itemId : player.inventory) {
-        const ItemData* item = findItem(itemId);
-        if (item && item->type == "weapon" && item->battleActionName == actionDisplayName) {
+std::unique_ptr<GameData::BattleActionInfo> GameData::FindBattleActionDetails(const PlayerStats& player, const std::string& action_display_name) const {
+    for (const auto& item_id : player.inventory) {
+        const ItemData* item = FindItem(item_id);
+        if (item && item->type == "weapon" && item->battle_action_name == action_display_name) {
             auto info = std::make_unique<BattleActionInfo>();
-            info->name = item->battleActionName;
-            info->checkStat = item->checkStat;
+            info->name = item->battle_action_name;
+            info->check_stat = item->check_stat;
             info->damage = item->damage;
-            info->manaCost = 0;
-            info->isInstantWin = false;
-            info->isSpell = false;
-            info->isWeapon = true;
-            info->weaponUsesTotal = item->usesPerBattle;
-            info->originalItemName = item->name;
+            info->mana_cost = 0;
+            info->is_instant_win = false;
+            info->is_spell = false;
+            info->is_weapon = true;
+            info->weapon_uses_total = item->uses_per_battle;
+            info->original_item_name = item->name;
             return info;
         }
     }
-    // Поиск среди изученных заклинаний
-    for (const auto& spellName : player.knownSpells) {
-        const SpellData* battleSpellDef = nullptr;
-        for (const auto& s_def : this->spells) { // this->spells для явного указания члена класса
-            if (s_def.name == spellName && s_def.type == "battle_spell" && s_def.battleActionName == actionDisplayName) {
-                battleSpellDef = &s_def;
+    for (const auto& spell_name : player.known_spells) {
+        const SpellData* battle_spell_def = nullptr;
+        for (const auto& s_def : this->spells) {
+            if (s_def.name == spell_name && s_def.type == "battle_spell" && s_def.battle_action_name == action_display_name) {
+                battle_spell_def = &s_def;
                 break;
             }
         }
-        if (battleSpellDef) {
+        if (battle_spell_def) {
             auto info = std::make_unique<BattleActionInfo>();
-            info->name = battleSpellDef->battleActionName;
-            info->checkStat = battleSpellDef->checkStat;
-            info->damage = battleSpellDef->damage;
-            info->manaCost = battleSpellDef->manaCost;
-            info->isInstantWin = battleSpellDef->instantWin;
-            info->isSpell = true;
-            info->isWeapon = false;
-            info->weaponUsesTotal = 0;
+            info->name = battle_spell_def->battle_action_name;
+            info->check_stat = battle_spell_def->check_stat;
+            info->damage = battle_spell_def->damage;
+            info->mana_cost = battle_spell_def->mana_cost;
+            info->is_instant_win = battle_spell_def->instant_win;
+            info->is_spell = true;
+            info->is_weapon = false;
+            info->weapon_uses_total = 0;
             return info;
         }
     }
-    // Базовые действия
-    if (actionDisplayName == "удар рукой") {
+    if (action_display_name == "удар рукой") {
         auto info = std::make_unique<BattleActionInfo>();
-        info->name = "удар рукой"; info->checkStat = "combatExperience"; info->damage = 0;
-        info->isInstantWin = false; info->isSpell = false; info->isWeapon = false; info->weaponUsesTotal = 0;
+        info->name = "удар рукой"; info->check_stat = "combat_experience"; info->damage = 0;
+        info->is_instant_win = false; info->is_spell = false; info->is_weapon = false; info->weapon_uses_total = 0;
         return info;
     }
-    if (actionDisplayName == "бегство") {
+    if (action_display_name == "бегство") {
         auto info = std::make_unique<BattleActionInfo>();
-        info->name = "бегство"; info->checkStat = "stamina"; info->damage = 0;
-        info->isInstantWin = true; info->isSpell = false; info->isWeapon = false; info->weaponUsesTotal = 0;
+        info->name = "бегство"; info->check_stat = "stamina"; info->damage = 0;
+        info->is_instant_win = true; info->is_spell = false; info->is_weapon = false; info->weapon_uses_total = 0;
         return info;
     }
-    if (actionDisplayName == "маскировка") {
+    if (action_display_name == "маскировка") {
         auto info = std::make_unique<BattleActionInfo>();
-        info->name = "маскировка"; info->checkStat = "intelligence"; info->damage = 0;
-        info->isInstantWin = true; info->isSpell = false; info->isWeapon = false; info->weaponUsesTotal = 0;
+        info->name = "маскировка"; info->check_stat = "intelligence"; info->damage = 0;
+        info->is_instant_win = true; info->is_spell = false; info->is_weapon = false; info->weapon_uses_total = 0;
         return info;
     }
-    return nullptr; // Действие не найдено
+    return nullptr;
 }

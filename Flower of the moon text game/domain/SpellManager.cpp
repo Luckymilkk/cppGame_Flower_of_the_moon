@@ -1,22 +1,22 @@
- #include "SpellManager.h"
+#include "SpellManager.h"
 
 namespace domain {
 
-void SpellManager::addSpell(const Spell& spell) {
-    spells[spell.id] = spell;
+void SpellManager::AddSpell(const Spell& spell) {
+    spells_[spell.id] = spell;
 }
 
-const Spell* SpellManager::getSpell(const std::string& id) const {
-    auto it = spells.find(id);
-    if (it != spells.end()) {
+const Spell* SpellManager::GetSpell(const std::string& id) const {
+    auto it = spells_.find(id);
+    if (it != spells_.end()) {
         return &it->second;
     }
     return nullptr;
 }
 
-std::vector<Spell> SpellManager::getAllSpells() const {
+std::vector<Spell> SpellManager::GetAllSpells() const {
     std::vector<Spell> result;
-    for (const auto& pair : spells) {
+    for (const auto& pair : spells_) {
         result.push_back(pair.second);
     }
     return result;

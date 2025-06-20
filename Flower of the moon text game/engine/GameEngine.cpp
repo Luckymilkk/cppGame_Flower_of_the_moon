@@ -11,551 +11,376 @@
 namespace engine {
 
 GameEngine::GameEngine() {
-    player = std::make_unique<domain::Player>();
+    player_ = std::make_unique<domain::Player>();
     
-    // Загрузка данных из файлов с проверкой
     try {
-        if (!data::DataLoader::loadPlayer(PLAYER_FILE, *player)) {
+        if (!data::DataLoader::loadPlayer(PLAYER_FILE, *player_)) {
             throw std::runtime_error("Ошибка загрузки данных игрока");
         }
-        if (!data::DataLoader::loadItems(ITEMS_FILE, itemManager)) {
+        if (!data::DataLoader::loadItems(ITEMS_FILE, item_manager_)) {
             throw std::runtime_error("Ошибка загрузки предметов");
         }
-        if (!data::DataLoader::loadMonsters(MONSTERS_FILE, monsterManager)) {
+        if (!data::DataLoader::loadMonsters(MONSTERS_FILE, monster_manager_)) {
             throw std::runtime_error("Ошибка загрузки монстров");
         }
-        if (!data::DataLoader::loadSpells(SPELLS_FILE, spellManager)) {
+        if (!data::DataLoader::loadSpells(SPELLS_FILE, spell_manager_)) {
             throw std::runtime_error("Ошибка загрузки заклинаний");
         }
-        if (!data::DataLoader::loadBooks(BOOKS_FILE, bookManager)) {
+        if (!data::DataLoader::loadBooks(BOOKS_FILE, book_manager_)) {
             throw std::runtime_error("Ошибка загрузки книг");
         }
-        if (!data::DataLoader::loadActions(PREPARATION_ACTIONS_FILE, actionManager)) {
+        if (!data::DataLoader::loadActions(PREPARATION_ACTIONS_FILE, action_manager_)) {
             throw std::runtime_error("Ошибка загрузки действий подготовки");
         }
     }
     catch (const std::exception& e) {
         std::cerr << "Ошибка инициализации игры: " << e.what() << std::endl;
-        throw; // Пробрасываем исключение дальше
+        throw;
     }
 }
 
-void GameEngine::run() {
+void GameEngine::Run() {
     std::cout << "Добро пожаловать в игру!" << std::endl;
-    preparationPhase();
-    battlePhase();
-    showFinalStats();
+    int attempts = 3;
+    domain::Player initial_player_state = *player_; // Сохраняем начальное состояние
+
+    while (attempts > 0) {
+        *player_ = initial_player_state; // Сброс к начальному состоянию
+        player_->health = player_->max_health; // Восстанавливаем здоровье до максимума
+        player_->mana = player_->magic_reserve;   // Восстанавливаем ману до максимума
+        player_->attempts = attempts;
+        std::cout << "\n--- ПОПЫТКА " << (4 - attempts) << "/3 ---" << std::endl;
+        
+        PreparationPhase();
+        
+        if (BattlePhase()) {
+            ShowFinalStats();
+            return; // Успешный выход из игры
+        } else {
+            attempts--;
+            if (attempts > 0) {
+                std::cout << "\nВы проиграли бой. Попробуйте снова. Осталось попыток: " << attempts << std::endl;
+            } else {
+                std::cout << "\nВы использовали все попытки. Игра окончена." << std::endl;
+            }
+        }
+    }
+    ShowFinalStats();
 }
 
-void GameEngine::preparationPhase() {
+void GameEngine::PreparationPhase() {
     std::cout << "\n--- ФАЗА ПОДГОТОВКИ ---" << std::endl;
-    while (player->steps > 0) {
-        // Отображаем текущее состояние
-        player->displayStats(itemManager);
-        int current_used_slots = player->getUsedInventorySlots(itemManager);
-        std::cout << "Занято слотов: " << current_used_slots << "/" << player->inventorySlots << std::endl;
-        std::cout << "Осталось шагов: " << player->steps << std::endl;
+    while (player_->steps > 0) {
+        player_->DisplayStats(item_manager_);
+        int current_used_slots = player_->GetUsedInventorySlots(item_manager_);
+        std::cout << "Занято слотов: " << current_used_slots << "/" << player_->inventory_slots << std::endl;
+        std::cout << "Осталось шагов: " << player_->steps << std::endl;
         std::cout << "Выберите действие:" << std::endl;
-        
         int menuOption = 1;
-        std::vector<std::function<void(bool&)>> availableMenuActions;
+        std::vector<std::function<void(bool&)>> actions;
 
-        // 1. Взять предметы
-        for (const auto& item : itemManager.getAllItems()) {
-            if (player->hasItem(item.id)) continue;
-
-            std::cout << menuOption << ". Взять '" << item.name << "' (Шаги: " << item.costSteps;
-            if (item.costSlots > 0) std::cout << ", Слоты: " << item.costSlots;
-            if (item.type == "preparation_item" && item.prepEffectType == "add_slots") {
-                std::cout << ", Эффект: +" << item.prepEffectValue << " слота инвентаря";
-            }
-            std::cout << ")" << std::endl;
-
-            availableMenuActions.push_back([this, item, current_used_slots](bool& actionPerformed) {
-                if (player->steps >= item.costSteps) {
-                    if (item.type == "preparation_item" && item.prepEffectType == "add_slots") {
-                        player->inventorySlots += item.prepEffectValue;
-                        player->addItem(item.id);
-                        std::cout << "'" << item.name << "' взята. Слоты инвентаря увеличены до " << player->inventorySlots << "." << std::endl;
-                        actionPerformed = true;
-                    }
-                    else { // Оружие или книга
-                        if (current_used_slots + item.costSlots <= player->inventorySlots) {
-                            player->addItem(item.id);
-                            std::cout << "'" << item.name << "' добавлен в инвентарь." << std::endl;
-                            if (item.type == "book") {
-                                if (!item.bookKey.empty()) {
-                                    std::cout << "Теперь вы можете прочитать книгу (это действие бесплатно)." << std::endl;
-                                } else {
-                                    std::cout << "Ошибка: у книги '" << item.name << "' не задан bookKey!" << std::endl;
-                                }
-                            }
-                            actionPerformed = true;
-                        }
-                        else {
-                            std::cout << "Недостаточно места в инвентаре!" << std::endl;
-                        }
-                    }
-                    if (actionPerformed) {
-                        player->steps -= item.costSteps;
-                        std::cout << "\nОбновленная информация:" << std::endl;
-                        player->displayStats(itemManager);
-                        int updated_slots = player->getUsedInventorySlots(itemManager);
-                        std::cout << "Занято слотов: " << updated_slots << "/" << player->inventorySlots << std::endl;
-                        std::cout << "Осталось шагов: " << player->steps << std::endl;
-                    }
-                }
-                else {
-                    std::cout << "Недостаточно шагов!" << std::endl;
-                }
-            });
-            ++menuOption;
-        }
-
-        // 2. Изучить заклинания
-        for (const auto& spell : spellManager.getAllSpells()) {
-            if (spell.type == "preparation_spell" && !player->knowsSpell(spell.name)) {
-                if (spell.requiresMagicAccessToLearn && !player->magicAccess) continue;
-
-                std::cout << menuOption << ". Освоить магию '" << spell.name << "' (Шаги: " << spell.costSteps << ")" << std::endl;
-                availableMenuActions.push_back([this, spell](bool& actionPerformed) {
-                    if (player->steps >= spell.costSteps) {
-                        player->knownSpells.push_back(spell.name);
-                        player->steps -= spell.costSteps;
-                        std::cout << "Магия '" << spell.name << "' освоена." << std::endl;
-                        actionPerformed = true;
-                        
-                        std::cout << "\nОбновленная информация:" << std::endl;
-                        player->displayStats(itemManager);
-                        int updated_slots = player->getUsedInventorySlots(itemManager);
-                        std::cout << "Занято слотов: " << updated_slots << "/" << player->inventorySlots << std::endl;
-                        std::cout << "Осталось шагов: " << player->steps << std::endl;
-                    }
-                    else {
-                        std::cout << "Недостаточно шагов!" << std::endl;
-                    }
+        // 1-3. Взять книги
+        struct BookOption { std::string id; std::string name; };
+        std::vector<BookOption> books = {
+            {"book_wolf", "книга о волках"},
+            {"book_centaur", "книга о кентавре"},
+            {"book_griffin", "книга о грифоне"}
+        };
+        for (const auto& book : books) {
+            if (!player_->HasItem(book.id) && current_used_slots + 1 <= player_->inventory_slots) {
+                std::cout << menuOption << ". Взять '" << book.name << "' (Шаги: 1, Слоты: 1)" << std::endl;
+                actions.push_back([this, book](bool& done) {
+                    player_->AddItem(book.id);
+                    player_->steps -= 1;
+                    std::cout << "'" << book.name << "' добавлена в инвентарь." << std::endl;
+                    done = true;
                 });
                 ++menuOption;
             }
         }
 
-        // 3. Подготовительные действия
-        for (const auto& action : actionManager.getAllActions()) {
-            if (action.requiresMagicAccess && !player->magicAccess) continue;
-            if (action.effectType == "enable_magic_access" && player->magicAccess) continue;
-
-            // Пропускаем действия чтения книг, если у игрока нет соответствующей книги
-            if (!action.requiresBook.empty() && !player->hasItem(action.requiresBook)) continue;
-            // Пропускаем действия чтения книг, если книга уже прочитана
-            if (!action.bookKey.empty() && player->booksActuallyRead[action.bookKey]) continue;
-
-            if (action.effectType == "increase_stat") {
-                int currentStat = player->getStatValue(action.targetStat);
-                if (currentStat >= action.maxValue) continue;
+        // Прочитать книги
+        for (const auto& book_opt : books) {
+            if (player_->HasItem(book_opt.id) && !player_->books_actually_read[book_opt.id]) {
+                std::cout << menuOption << ". Прочитать '" << book_opt.name << "' (Шаги: 0)" << std::endl;
+                actions.push_back([this, book_opt](bool& done) {
+                    player_->books_actually_read[book_opt.id] = true;
+                    // player_->steps -= 0; // Шаги не тратятся
+                    const auto& book_content = book_manager_.GetBook(book_opt.id);
+                    if (book_content) {
+                        std::cout << "\n=== " << book_content->title << " ===" << std::endl;
+                        std::cout << book_content->content << std::endl;
+                        std::cout << "====================\n" << std::endl;
+                    }
+                    else {
+                        std::cout << "Ошибка: не удалось найти содержимое книги." << std::endl;
+                    }
+                    done = true;
+                });
+                ++menuOption;
             }
+        }
 
-            std::cout << menuOption << ". " << action.menuText << " (Шаги: " << action.costSteps << ")" << std::endl;
-            availableMenuActions.push_back([this, action](bool& actionPerformed) {
-                if (player->steps >= action.costSteps) {
-                    bool successInAction = false;
-                    if (action.effectType == "increase_stat") {
-                        player->modifyStat(action.targetStat, action.effectValue, action.maxValue);
-                        successInAction = true;
-                    }
-                    else if (action.effectType == "enable_magic_access") {
-                        if (!player->magicAccess) {
-                            player->magicAccess = true;
-                            std::cout << "Доступ к магии восстановлен!" << std::endl;
-                            successInAction = true;
-                        }
-                        else {
-                            std::cout << "Доступ к магии уже есть." << std::endl;
-                        }
-                    }
-                    else if (action.effectType == "read_book") {
-                        // Отладочная информация
-                        std::cout << "Проверка чтения книги:" << std::endl;
-                        std::cout << "requiresBook: " << action.requiresBook << std::endl;
-                        std::cout << "bookKey: " << action.bookKey << std::endl;
-                        std::cout << "Книга в инвентаре: " << (player->hasItem(action.requiresBook) ? "да" : "нет") << std::endl;
-                        std::cout << "Книга уже прочитана: " << (player->booksActuallyRead[action.bookKey] ? "да" : "нет") << std::endl;
-
-                        // Проверяем, есть ли у игрока нужная книга
-                        if (!action.requiresBook.empty() && player->hasItem(action.requiresBook)) {
-                            // Проверяем, не прочитана ли уже книга
-                            if (!action.bookKey.empty() && !player->booksActuallyRead[action.bookKey]) {
-                                player->booksActuallyRead[action.bookKey] = true;
-                                // Используем requiresBook вместо bookKey для поиска книги
-                                const auto* book = bookManager.getBook(action.requiresBook);
-                                if (book) {
-                                    std::cout << "\n=== " << book->title << " ===" << std::endl;
-                                    std::cout << book->content << std::endl;
-                                    
-                                    // Устанавливаем флаг успешного выполнения сразу после вывода содержимого книги
-                                    successInAction = true;
-                                    
-                                    // Поиск монстра по bookKey
-                                    for (const auto& monster : monsterManager.getAllMonsters()) {
-                                        if (monster.bookKey == action.bookKey) {
-                                            std::cout << "\nУдачные действия против монстра:";
-                                            for (const auto& action : monster.favorableActions) {
-                                                std::cout << " " << action;
-                                            }
-                                            
-                                            std::cout << "\nПровальные действия против монстра:";
-                                            for (const auto& action : monster.unfavorableActions) {
-                                                std::cout << " " << action;
-                                            }
-                                            
-                                            if (!monster.neutralActions.empty()) {
-                                                std::cout << "\nНейтральные действия против монстра:";
-                                                for (const auto& action : monster.neutralActions) {
-                                                    std::cout << " " << action;
-                                                }
-                                            }
-                                            std::cout << std::endl;
-                                            break;
-                                        }
-                                    }
-                                    
-                                    std::cout << "====================\n" << std::endl;
-                                } else {
-                                    std::cout << "Ошибка: книга не найдена в базе данных." << std::endl;
-                                }
-                            } else {
-                                std::cout << "Вы уже прочитали эту книгу." << std::endl;
-                            }
-                        } else {
-                            std::cout << "У вас нет нужной книги для этого действия." << std::endl;
-                        }
-                    }
-                    if (successInAction) {
-                        player->steps -= action.costSteps;
-                        actionPerformed = true;
-                        
-                        std::cout << "\nОбновленная информация:" << std::endl;
-                        player->displayStats(itemManager);
-                        int updated_slots = player->getUsedInventorySlots(itemManager);
-                        std::cout << "Занято слотов: " << updated_slots << "/" << player->inventorySlots << std::endl;
-                        std::cout << "Осталось шагов: " << player->steps << std::endl;
-                    }
-                }
-                else {
-                    std::cout << "Недостаточно шагов!" << std::endl;
-                }
+        // 4. Взять сумку
+        if (!player_->HasItem("bag")) {
+            std::cout << menuOption << ". Взять 'сумка' (Шаги: 1, Эффект: +2 слота инвентаря)" << std::endl;
+            actions.push_back([this](bool& done) {
+                player_->AddItem("bag");
+                player_->inventory_slots += 2;
+                player_->steps -= 1;
+                std::cout << "'Сумка' добавлена. Слоты инвентаря увеличены до " << player_->inventory_slots << "." << std::endl;
+                done = true;
             });
             ++menuOption;
         }
-
-        std::cout << "0. Закончить подготовку досрочно" << std::endl;
-        int choice = getIntInput("Ваш выбор (введите номер): ", 0, menuOption - 1);
-        if (choice == 0) {
+        // 5-12. Взять оружие
+        struct WeaponOption { std::string id; std::string name; int cost_steps; int cost_slots; };
+        std::vector<WeaponOption> weapons = {
+            {"sword", "меч", 1, 1},
+            {"axe", "топор", 1, 1},
+            {"whip", "кнут", 1, 1},
+            {"rifle", "ружье", 1, 1},
+            {"bow", "лук и стрелы", 2, 2},
+            {"knife", "нож", 1, 1}
+        };
+        for (const auto& weapon : weapons) {
+            if (!player_->HasItem(weapon.id) && current_used_slots + weapon.cost_slots <= player_->inventory_slots) {
+                std::cout << menuOption << ". Взять '" << weapon.name << "' (Шаги: " << weapon.cost_steps << ", Слоты: " << weapon.cost_slots << ")" << std::endl;
+                actions.push_back([this, weapon](bool& done) {
+                    player_->AddItem(weapon.id);
+                    player_->steps -= weapon.cost_steps;
+                    std::cout << "'" << weapon.name << "' добавлен в инвентарь." << std::endl;
+                    done = true;
+                });
+                ++menuOption;
+            }
+        }
+        // 13-14. Прокачка характеристик
+        struct StatOption { std::string stat; std::string name; };
+        std::vector<StatOption> stats = {
+            {"agility", "ловкость"},
+            {"accuracy", "меткость"},
+            {"stamina", "выносливость"},
+            {"intelligence", "ум"},
+            {"combat_experience", "боевой опыт"}
+        };
+        for (const auto& stat : stats) {
+            std::cout << menuOption << ". Прокачать " << stat.name << " (Шаги: 1)" << std::endl;
+            actions.push_back([this, stat](bool& done) {
+                player_->ModifyStat(stat.stat, 1, 3);
+                player_->steps -= 1;
+                done = true;
+            });
+            ++menuOption;
+        }
+        // 14. Восстановить доступ к магии
+        if (!player_->magic_access) {
+            std::cout << menuOption << ". Восстановить доступ к магии (Шаги: 1)" << std::endl;
+            actions.push_back([this](bool& done) {
+                player_->magic_access = true;
+                player_->steps -= 1;
+                std::cout << "Доступ к магии восстановлен!" << std::endl;
+                done = true;
+            });
+            ++menuOption;
+        }
+        // 15-20. Действия, доступные только после восстановления магии
+        if (player_->magic_access) {
+            // 15-17. Изучить заклинания
+            struct SpellOption { std::string name; std::string display; };
+            std::vector<SpellOption> spells = {
+                {"световой луч", "Освоить магию световой луч"},
+                {"ослепление", "Освоить магию ослепление"},
+                {"приручение", "Освоить магию приручение"}
+            };
+            for (const auto& spell : spells) {
+                if (!player_->KnowsSpell(spell.name)) {
+                    std::cout << menuOption << ". " << spell.display << " (Шаги: 1)" << std::endl;
+                    actions.push_back([this, spell](bool& done) {
+                        player_->known_spells.push_back(spell.name);
+                        player_->steps -= 1;
+                        std::cout << "Магия '" << spell.name << "' освоена." << std::endl;
+                        done = true;
+                    });
+                    ++menuOption;
+                }
+            }
+            // 18-20. Прокачка магических характеристик
+            struct MagicStatOption { std::string stat; std::string name; };
+            std::vector<MagicStatOption> magic_stats = {
+                {"magic_control", "контроль магии"},
+                {"magic_experience", "магический опыт"},
+                {"psychic_stability", "психическая стабильность"}
+            };
+            for (const auto& stat : magic_stats) {
+                std::cout << menuOption << ". Прокачать " << stat.name << " (Шаги: 1)" << std::endl;
+                actions.push_back([this, stat](bool& done) {
+                    player_->ModifyStat(stat.stat, 1, 3);
+                    player_->steps -= 1;
+                    done = true;
+                });
+                ++menuOption;
+            }
+        }
+        std::cout << menuOption << ". Закончить подготовку досрочно" << std::endl;
+        actions.push_back([](bool& done) { done = false; });
+        int choice = GetIntInput("Ваш выбор (введите номер): ", 1, menuOption);
+        if (choice == menuOption) {
             std::cout << "Подготовка завершена досрочно." << std::endl;
             break;
         }
-        if (choice > 0 && choice <= availableMenuActions.size()) {
-            bool actionWasPerformed = false;
-            availableMenuActions[choice - 1](actionWasPerformed);
-            if (!actionWasPerformed) {
-                std::cout << "Действие не было выполнено." << std::endl;
-            }
-            std::cout << "\nНажмите Enter для продолжения...";
-            std::cin.get();
-        } else {
-            std::cout << "Неверный выбор." << std::endl;
+        bool actionDone = false;
+        actions[choice - 1](actionDone);
+        if (choice == menuOption) {
+            std::cout << "Подготовка завершена досрочно." << std::endl;
+            break;
         }
-    }
-    if (player->steps <= 0) {
-        std::cout << "\nШаги для подготовки закончились!" << std::endl;
+        if (actionDone) continue;
     }
     std::cout << "--- ПОДГОТОВКА ЗАВЕРШЕНА ---" << std::endl;
 }
 
-void GameEngine::battlePhase() {
+// Новая структура для описания боевого действия
+struct BattleAction {
+    std::string name;
+    std::string check_stat;
+    int damage;
+    int mana_cost;
+    bool is_instant_win;
+    std::function<bool(domain::Player&)> requirement;
+    
+    BattleAction(std::string n, std::string cs, int d, int mc, bool iw, std::function<bool(domain::Player&)> req)
+        : name(n), check_stat(cs), damage(d), mana_cost(mc), is_instant_win(iw), requirement(req) {}
+};
+
+bool GameEngine::BattlePhase() {
+    std::vector<BattleAction> all_actions = {
+        {"Удар рукой", "combat_experience", 0, 0, false, [](domain::Player& p){ return true; }},
+        {"Бегство", "stamina", 0, 0, true, [](domain::Player& p){ return true; }},
+        {"Маскировка", "intelligence", 0, 0, true, [](domain::Player& p){ return true; }},
+        {"Удар мечом", "agility", 40, 0, false, [](domain::Player& p){ return p.HasItem("sword"); }},
+        {"Выстрел из лука", "accuracy", 50, 0, false, [](domain::Player& p){ return p.HasItem("bow"); }},
+        {"Выстрел из ружья", "accuracy", 40, 0, false, [](domain::Player& p){ return p.HasItem("rifle") && p.rifle_uses_per_battle < 2; }},
+        {"Удар кнутом", "accuracy", 40, 0, false, [](domain::Player& p){ return p.HasItem("whip"); }},
+        {"Удар ножом", "combat_experience", 15, 0, false, [](domain::Player& p){ return p.HasItem("knife"); }},
+        {"Удар топором", "agility", 35, 0, false, [](domain::Player& p){ return p.HasItem("axe"); }},
+        {"Магический луч", "magic_control", 80, 1, false, [](domain::Player& p){ return p.KnowsSpell("световой луч") && p.mana > 0; }},
+        {"Ослепление", "magic_experience", 0, 1, true, [](domain::Player& p){ return p.KnowsSpell("ослепление") && p.mana > 0; }},
+        {"Приручение", "psychic_stability", 0, 1, true, [](domain::Player& p){ return p.KnowsSpell("приручение") && p.mana > 0; }}
+    };
+
     std::cout << "\n--- ФАЗА БОЯ ---" << std::endl;
     std::cout << "Чтобы выиграть, вам нужно победить 3 монстра!" << std::endl;
     int monstersDefeated = 0;
-    player->rifleUsesPerBattle = 0; // Сбрасываем счетчик использования ружья
+    
+    auto all_monsters = monster_manager_.GetAllMonsters(); // Получаем монстров из менеджера
 
-    for (auto& monster : monsterManager.getAllMonsters()) {
+    for (const auto& monster_prototype : all_monsters) {
         if (monstersDefeated >= 3) break;
-        
-        std::cout << "\nВас атакует монстр: " << monster.name << "!" << std::endl;
 
-        // Проверяем, есть ли у игрока книга об этом монстре
-        if (!monster.bookKey.empty()) {
-            for (const auto& book : bookManager.getAllBooks()) {
-                if (book.id == monster.bookKey && player->hasItem(book.id)) {
-                    std::cout << "\nВы знаете характеристики этого монстра из книги:" << std::endl;
-                    std::cout << "Здоровье: " << monster.health << std::endl;
-                    std::cout << "Урон: " << monster.attack << std::endl;
-                    std::cout << "Защита: " << monster.defense << std::endl;
-                    
-                    std::cout << "\nУдачные действия:";
-                    for (const auto& action : monster.favorableActions) {
-                        std::cout << " " << action;
-                    }
-                    
-                    std::cout << "\nПровальные действия:";
-                    for (const auto& action : monster.unfavorableActions) {
-                        std::cout << " " << action;
-                    }
-                    
-                    if (!monster.neutralActions.empty()) {
-                        std::cout << "\nНейтральные действия:";
-                        for (const auto& action : monster.neutralActions) {
-                            std::cout << " " << action;
-                        }
-                    }
-                    std::cout << std::endl;
-                    break;
+        // Создаем боевую копию монстра на основе данных из менеджера
+        MonsterData current_monster;
+        current_monster.name = monster_prototype.name;
+        current_monster.initial_hp = monster_prototype.health;
+        current_monster.current_hp = monster_prototype.health;
+        current_monster.book_key = monster_prototype.bookKey;
+        current_monster.favorable_actions = monster_prototype.favorableActions;
+        current_monster.unfavorable_actions = monster_prototype.unfavorableActions;
+        current_monster.neutral_actions = monster_prototype.neutralActions;
+        
+        player_->rifle_uses_per_battle = 0; 
+
+        std::cout << "\n========================================" << std::endl;
+        std::cout << "Вас атакует монстр: " << current_monster.name << "!" << std::endl;
+        std::cout << "========================================" << std::endl;
+
+        if (player_->books_actually_read[current_monster.book_key]) {
+            std::cout << "\nИнформация из книги:" << std::endl;
+            const auto& book = book_manager_.GetBook(current_monster.book_key);
+            if (book) std::cout << book->content << std::endl;
+        }
+
+        while (current_monster.current_hp > 0 && player_->health > 0) {
+            std::cout << "\n--- ВАШ ХОД ---" << std::endl;
+            player_->DisplayStats(item_manager_);
+            current_monster.DisplayInfo(*player_, book_manager_);
+            std::cout << "Здоровье монстра: " << current_monster.current_hp << "/" << current_monster.initial_hp << std::endl;
+            
+            std::vector<BattleAction> available_actions;
+            std::cout << "\nВыберите действие:" << std::endl;
+            int menu_idx = 1;
+            for (const auto& action : all_actions) {
+                if (action.requirement(*player_)) {
+                    std::cout << menu_idx << ". " << action.name << " (Проверка: " << action.check_stat << ")" << std::endl;
+                    available_actions.push_back(action);
+                    menu_idx++;
                 }
+            }
+            
+            int choice = GetIntInput("Ваш выбор: ", 1, static_cast<int>(available_actions.size()));
+            const auto& chosen_action = available_actions[choice - 1];
+            
+            double coef = current_monster.GetActionCoefficient(chosen_action.name);
+            double result = coef * player_->GetStatValue(chosen_action.check_stat);
+            
+            bool success = false;
+            if (result > 1.5) {
+                std::cout << "Успех! ";
+                success = true;
+            } else if (std::abs(result - 1.5) < 1e-9) { // Сравнение double чисел
+                std::cout << "Нейтрально. ";
+                success = true; 
+            } else { // result < 1.5
+                std::cout << "Провал... ";
+                success = false;
+            }
+
+            if (success) {
+                if (chosen_action.is_instant_win) {
+                    std::cout << "Вы мгновенно побеждаете монстра!" << std::endl;
+                    current_monster.current_hp = 0;
+                } else {
+                    current_monster.current_hp -= chosen_action.damage;
+                    std::cout << "Вы нанесли " << chosen_action.damage << " урона." << std::endl;
+                }
+                player_->mana -= chosen_action.mana_cost;
+                if (chosen_action.name == "Выстрел из ружья") {
+                    player_->rifle_uses_per_battle++;
+                }
+            }
+
+            // Монстр атакует при провале или нейтральном результате, если он еще жив
+            if ((!success || std::abs(result - 1.5) < 1e-9) && current_monster.current_hp > 0) {
+                std::cout << "Монстр атакует в ответ!" << std::endl;
+                player_->TakeDamage(1);
             }
         }
 
-        int lastChoice = 0; // Переменная для хранения последнего выбора
-        std::string lastAction; // Переменная для хранения названия последнего действия
-        
-        while (monster.isAlive() && player->health > 0) {
-            std::cout << "\nВаше здоровье: " << player->health << ", Здоровье монстра: " << monster.health << std::endl;
-            std::cout << "Доступные действия:" << std::endl;
-            std::cout << "1. Удар рукой (проверка: опыт в боях)" << std::endl;
-            std::cout << "2. Бегство (проверка: выносливость)" << std::endl;
-            std::cout << "3. Маскировка (проверка: ум)" << std::endl;
-            
-            if (player->hasItem("sword"))
-                std::cout << "4. Удар мечом (проверка: ловкость)" << std::endl;
-            
-            if (player->hasItem("bow") && player->hasItem("arrows"))
-                std::cout << "5. Выстрел из лука (проверка: меткость)" << std::endl;
-            
-            if (player->hasItem("rifle") && player->rifleUsesPerBattle < 2)
-                std::cout << "6. Выстрел из ружья (проверка: меткость)" << std::endl;
-            
-            if (player->hasItem("whip"))
-                std::cout << "7. Удар кнутом (проверка: меткость)" << std::endl;
-            
-            if (player->hasItem("knife"))
-                std::cout << "8. Удар ножом (проверка: опыт в боях)" << std::endl;
-            
-            if (player->hasItem("axe"))
-                std::cout << "9. Удар топором (проверка: ловкость)" << std::endl;
-            
-            if (player->knowsSpell("световой луч") && player->magicReserve > 0)
-                std::cout << "10. Магический луч (проверка: контроль магии)" << std::endl;
-            
-            if (player->knowsSpell("ослепление") && player->magicReserve > 0)
-                std::cout << "11. Ослепление (проверка: опыт магии)" << std::endl;
-            
-            if (player->knowsSpell("приручение") && player->magicReserve > 0)
-                std::cout << "12. Приручение (проверка: психическая стабильность)" << std::endl;
-            
-            std::cout << "0. Сдаться" << std::endl;
-
-            lastChoice = getIntInput("Ваш выбор: ", 0, 12);
-            bool actionSuccess = false;
-            float actionValue = 0.0f;
-            float actionCoefficient = 1.0f; // По умолчанию действие нейтральное
-
-            // Определяем название действия
-            switch (lastChoice) {
-                case 1: lastAction = "удар рукой"; break;
-                case 2: lastAction = "бегство"; break;
-                case 3: lastAction = "маскировка"; break;
-                case 4: lastAction = "удар мечом"; break;
-                case 5: lastAction = "выстрел из лука"; break;
-                case 6: lastAction = "выстрел из ружья"; break;
-                case 7: lastAction = "удар кнутом"; break;
-                case 8: lastAction = "удар ножом"; break;
-                case 9: lastAction = "удар топором"; break;
-                case 10: lastAction = "магический луч"; break;
-                case 11: lastAction = "ослепление"; break;
-                case 12: lastAction = "приручение"; break;
-                case 0: 
-                    std::cout << "Вы сдались!" << std::endl;
-                    player->health = 0;
-                    return;
-            }
-
-            // Определяем коэффициент действия
-            if (std::find(monster.favorableActions.begin(), monster.favorableActions.end(), lastAction) != monster.favorableActions.end()) {
-                actionCoefficient = 2.0f;
-            } else if (std::find(monster.unfavorableActions.begin(), monster.unfavorableActions.end(), lastAction) != monster.unfavorableActions.end()) {
-                actionCoefficient = 0.5f;
-            }
-
-            switch (lastChoice) {
-                case 1: // Удар рукой
-                    actionValue = actionCoefficient * player->combatExperience;
-                    if (actionValue > 1.5f) {
-                        monster.takeDamage(10);
-                        std::cout << "Вы успешно ударили монстра!" << std::endl;
-                        actionSuccess = true;
-                    }
-                    break;
-
-                case 2: // Бегство
-                    actionValue = actionCoefficient * player->stamina;
-                    if (actionValue > 1.5f) {
-                        std::cout << "Вы успешно сбежали от монстра!" << std::endl;
-                        monster.health = 0;
-                        monstersDefeated++;
-                        actionSuccess = true;
-                    }
-                    break;
-
-                case 3: // Маскировка
-                    actionValue = actionCoefficient * player->intelligence;
-                    if (actionValue > 1.5f) {
-                        std::cout << "Вы успешно обманули монстра!" << std::endl;
-                        monster.health = 0;
-                        monstersDefeated++;
-                        actionSuccess = true;
-                    }
-                    break;
-
-                case 4: // Удар мечом
-                    if (player->hasItem("sword")) {
-                        actionValue = actionCoefficient * player->agility;
-                        if (actionValue > 1.5f) {
-                            monster.takeDamage(40);
-                            std::cout << "Вы успешно атаковали мечом!" << std::endl;
-                            actionSuccess = true;
-                        }
-                    }
-                    break;
-
-                case 5: // Выстрел из лука
-                    if (player->hasItem("bow") && player->hasItem("arrows")) {
-                        actionValue = actionCoefficient * player->accuracy;
-                        if (actionValue > 1.5f) {
-                            monster.takeDamage(50);
-                            std::cout << "Вы успешно выстрелили из лука!" << std::endl;
-                            actionSuccess = true;
-                        }
-                    }
-                    break;
-
-                case 6: // Выстрел из ружья
-                    if (player->hasItem("rifle") && player->rifleUsesPerBattle < 2) {
-                        actionValue = actionCoefficient * player->accuracy;
-                        if (actionValue > 1.5f) {
-                            monster.takeDamage(40);
-                            std::cout << "Вы успешно выстрелили из ружья!" << std::endl;
-                            actionSuccess = true;
-                        }
-                        player->rifleUsesPerBattle++;
-                    }
-                    break;
-
-                case 7: // Удар кнутом
-                    if (player->hasItem("whip")) {
-                        actionValue = actionCoefficient * player->accuracy;
-                        if (actionValue > 1.5f) {
-                            monster.takeDamage(40);
-                            std::cout << "Вы успешно атаковали кнутом!" << std::endl;
-                            actionSuccess = true;
-                        }
-                    }
-                    break;
-
-                case 8: // Удар ножом
-                    if (player->hasItem("knife")) {
-                        actionValue = actionCoefficient * player->combatExperience;
-                        if (actionValue > 1.5f) {
-                            monster.takeDamage(15);
-                            std::cout << "Вы успешно атаковали ножом!" << std::endl;
-                            actionSuccess = true;
-                        }
-                    }
-                    break;
-
-                case 9: // Удар топором
-                    if (player->hasItem("axe")) {
-                        actionValue = actionCoefficient * player->agility;
-                        if (actionValue > 1.5f) {
-                            monster.takeDamage(35);
-                            std::cout << "Вы успешно атаковали топором!" << std::endl;
-                            actionSuccess = true;
-                        }
-                    }
-                    break;
-
-                case 10: // Магический луч
-                    if (player->knowsSpell("световой луч") && player->magicReserve > 0) {
-                        actionValue = actionCoefficient * player->magicControl;
-                        if (actionValue > 1.5f) {
-                            monster.takeDamage(80);
-                            std::cout << "Вы успешно использовали магический луч!" << std::endl;
-                            actionSuccess = true;
-                        }
-                        player->magicReserve--;
-                    }
-                    break;
-
-                case 11: // Ослепление
-                    if (player->knowsSpell("ослепление") && player->magicReserve > 0) {
-                        actionValue = actionCoefficient * player->magicExperience;
-                        if (actionValue > 1.5f) {
-                            std::cout << "Вы успешно ослепили монстра!" << std::endl;
-                            monster.health = 0;
-                            monstersDefeated++;
-                            actionSuccess = true;
-                        }
-                        player->magicReserve--;
-                    }
-                    break;
-
-                case 12: // Приручение
-                    if (player->knowsSpell("приручение") && player->magicReserve > 0) {
-                        actionValue = actionCoefficient * player->psychicStability;
-                        if (actionValue > 1.5f) {
-                            std::cout << "Вы успешно приручили монстра!" << std::endl;
-                            monster.health = 0;
-                            monstersDefeated++;
-                            actionSuccess = true;
-                        }
-                        player->magicReserve--;
-                    }
-                    break;
-            }
-
-            if (actionValue == 1.5f) {
-                std::cout << "Действие нейтральное!" << std::endl;
-                if (monster.isAlive()) {
-                    player->takeDamage(1);
-                    std::cout << "Монстр атакует! Вы получаете 1 урона." << std::endl;
-                }
-            } else if (!actionSuccess && lastChoice != 0) {
-                std::cout << "Действие провалено!" << std::endl;
-                player->takeDamage(1);
-                std::cout << "Монстр атакует! Вы получаете 1 урона." << std::endl;
-            } else if (actionSuccess) {
-                std::cout << "Действие успешно! Монстр пропускает ход." << std::endl;
-            }
-        }
-
-        if (player->health <= 0) {
-            std::cout << "Вы проиграли бой!" << std::endl;
-            return;
-        } else if (monster.health <= 0) {
-            std::cout << "Монстр повержен!" << std::endl;
-            if (lastChoice != 2 && lastChoice != 3 && lastChoice != 11 && lastChoice != 12) {
-                monstersDefeated++;
-            }
+        if (player_->health > 0) {
+            std::cout << "\n*** Вы победили " << current_monster.name << "! ***" << std::endl;
+            monstersDefeated++;
+        } else {
+            std::cout << "\nВы были побеждены..." << std::endl;
+            // Логика попыток будет здесь
+            break;
         }
     }
 
     if (monstersDefeated >= 3) {
-        std::cout << "\nПоздравляем! Вы победили необходимое количество монстров!" << std::endl;
+        std::cout << "\n\n*** ПОЗДРАВЛЯЕМ! ВЫ ПРОШЛИ ИГРУ! ***" << std::endl;
+        return true; // Победа
+    } else if (player_->health > 0) {
+        std::cout << "\n\nВы не смогли победить всех монстров. Попробуйте снова!" << std::endl;
+        return false; // Поражение
     } else {
-        std::cout << "\nВы не смогли победить необходимое количество монстров." << std::endl;
+        std::cout << "\n\n--- ИГРА ОКОНЧЕНА ---" << std::endl;
+        return false; // Поражение
     }
 }
 
-void GameEngine::showFinalStats() {
+void GameEngine::ShowFinalStats() {
     std::cout << "\n--- Финальные характеристики игрока ---" << std::endl;
-    player->displayStats(itemManager);
+    player_->DisplayStats(item_manager_);
     std::cout << "Спасибо за игру!" << std::endl;
 }
 

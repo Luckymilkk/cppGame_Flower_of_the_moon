@@ -1,19 +1,2 @@
-﻿  data_structures.cpp
-  DataLoader.cpp
-  Action.cpp
-  ActionManager.cpp
-  Book.cpp
-  BookManager.cpp
-  Item.cpp
-  ItemManager.cpp
-  Monster.cpp
-  MonsterManager.cpp
-  Player.cpp
-  Spell.cpp
-  SpellManager.cpp
-  GameEngine.cpp
-  file_parser.cpp
-  Flower of the moon text game.cpp
-  utils.cpp
-  Создание кода...
+﻿  main.cpp
   Flower of the moon text game.vcxproj -> C:\Users\Маша\Documents\GitHub\cppGame_Flower_of_the_moon\Flower of the moon text game\x64\Debug\Flower of the moon text game.exe

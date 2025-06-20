@@ -1,6 +1,5 @@
-﻿#pragma once
-#ifndef UTILS_H
-#define UTILS_H
+﻿#ifndef FLOWER_OF_THE_MOON_UTILS_H_
+#define FLOWER_OF_THE_MOON_UTILS_H_
 
 #include <string>
 #include <vector>
@@ -9,13 +8,19 @@
 #include <sstream>
 #include <algorithm>
 
-// Разделяет строку s по указанному разделителю delimiter
-std::vector<std::string> splitString(const std::string& s, char delimiter);
+/**
+ * @brief Разбивает строку s по указанному разделителю.
+ */
+std::vector<std::string> SplitString(const std::string& s, char delimiter);
 
-// Удаляет пробелы с начала и конца строки
-std::string trimString(const std::string& str);
+/**
+ * @brief Обрезает пробелы с начала и конца строки.
+ */
+std::string TrimString(const std::string& str);
 
-// Безопасный ввод целого числа с проверкой диапазона
-int getIntInput(const std::string& prompt, int minVal = std::numeric_limits<int>::min(), int maxVal = std::numeric_limits<int>::max());
+/**
+ * @brief Безопасный ввод целого числа с проверкой диапазона.
+ */
+int GetIntInput(const std::string& prompt, int min_val = std::numeric_limits<int>::min(), int max_val = std::numeric_limits<int>::max());
 
-#endif // UTILS_H
+#endif  // FLOWER_OF_THE_MOON_UTILS_H_
