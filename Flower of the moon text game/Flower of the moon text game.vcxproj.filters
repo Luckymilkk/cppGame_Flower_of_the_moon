@@ -13,33 +13,129 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Исходные файлы\domain">
+      <UniqueIdentifier>{your-guid-here}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\domain">
+      <UniqueIdentifier>{your-guid-here}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\engine">
+      <UniqueIdentifier>{your-guid-here}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\engine">
+      <UniqueIdentifier>{your-guid-here}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\data">
+      <UniqueIdentifier>{your-guid-here}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\data">
+      <UniqueIdentifier>{your-guid-here}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Flower of the moon text game.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="utils.cpp">
+    <ClCompile Include="data_structures.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="file_parser.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="data_structures.cpp">
+    <ClCompile Include="utils.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="domain\Action.cpp">
+      <Filter>Исходные файлы\domain</Filter>
+    </ClCompile>
+    <ClCompile Include="domain\ActionManager.cpp">
+      <Filter>Исходные файлы\domain</Filter>
+    </ClCompile>
+    <ClCompile Include="domain\Book.cpp">
+      <Filter>Исходные файлы\domain</Filter>
+    </ClCompile>
+    <ClCompile Include="domain\BookManager.cpp">
+      <Filter>Исходные файлы\domain</Filter>
+    </ClCompile>
+    <ClCompile Include="domain\Item.cpp">
+      <Filter>Исходные файлы\domain</Filter>
+    </ClCompile>
+    <ClCompile Include="domain\ItemManager.cpp">
+      <Filter>Исходные файлы\domain</Filter>
+    </ClCompile>
+    <ClCompile Include="domain\Monster.cpp">
+      <Filter>Исходные файлы\domain</Filter>
+    </ClCompile>
+    <ClCompile Include="domain\MonsterManager.cpp">
+      <Filter>Исходные файлы\domain</Filter>
+    </ClCompile>
+    <ClCompile Include="domain\Player.cpp">
+      <Filter>Исходные файлы\domain</Filter>
+    </ClCompile>
+    <ClCompile Include="domain\Spell.cpp">
+      <Filter>Исходные файлы\domain</Filter>
+    </ClCompile>
+    <ClCompile Include="domain\SpellManager.cpp">
+      <Filter>Исходные файлы\domain</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\GameEngine.cpp">
+      <Filter>Исходные файлы\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="data\DataLoader.cpp">
+      <Filter>Исходные файлы\data</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="config.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="utils.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="data_structures.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="file_parser.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="domain\Action.h">
+      <Filter>Файлы заголовков\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="domain\ActionManager.h">
+      <Filter>Файлы заголовков\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="domain\Book.h">
+      <Filter>Файлы заголовков\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="domain\BookManager.h">
+      <Filter>Файлы заголовков\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="domain\Item.h">
+      <Filter>Файлы заголовков\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="domain\ItemManager.h">
+      <Filter>Файлы заголовков\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="domain\Monster.h">
+      <Filter>Файлы заголовков\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="domain\MonsterManager.h">
+      <Filter>Файлы заголовков\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="domain\Player.h">
+      <Filter>Файлы заголовков\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="domain\Spell.h">
+      <Filter>Файлы заголовков\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="domain\SpellManager.h">
+      <Filter>Файлы заголовков\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\GameEngine.h">
+      <Filter>Файлы заголовков\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="data\DataLoader.h">
+      <Filter>Файлы заголовков\data</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

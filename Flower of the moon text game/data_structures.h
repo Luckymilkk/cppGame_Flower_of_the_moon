@@ -6,39 +6,41 @@
 #include <vector>
 #include <map>
 #include <memory> // для std::unique_ptr
+#include "domain/ItemManager.h"
+#include "domain/Action.h"
 // НЕ НУЖНЫ здесь: <iostream>, <iomanip>, <algorithm> для реализаций, они уйдут в .cpp
 
 // --- Структуры для хранения данных ---
 
 struct PlayerStats {
-    int hp;
-    int maxHp;
-    int steps;
-    int inventorySlots;
+    int hp = 100;
+    int maxHp = 100;
+    int steps = 10;
+    int inventorySlots = 3;
     int attempts;
 
     int agility;
     int accuracy;
     int stamina;
-    int intelligence;
+    int intelligence = 0;
     int combatExperience;
     int magicControl;
     int magicExperience;
     int psychicStability;
 
-    bool magicAccess;
-    int magicReserve;
-    int maxMagicReserve;
+    bool magicAccess = false;
+    int magicReserve = 50;
+    int maxMagicReserve = 50;
 
     std::vector<std::string> inventory;
     std::vector<std::string> knownSpells;
     std::map<std::string, bool> booksActuallyRead;
-    int rifleUsesPerBattle;
+    int rifleUsesPerBattle = 0;
 
     PlayerStats(); // Конструктор может остаться inline, если он простой, или тоже вынесен
 
     // ОБЪЯВЛЕНИЯ методов
-    void displayStats() const;
+    void displayStats(const domain::ItemManager& itemManager) const;
     void resetForNewAttempt(const PlayerStats& initialConfig);
     bool hasItem(const std::string& itemName) const;
     bool knowsSpell(const std::string& spellName) const;
@@ -64,8 +66,8 @@ struct MonsterData {
 };
 
 struct ItemData {
-    // ... (содержимое ItemData как было) ...
-    std::string name;
+    std::string id;      // Уникальный идентификатор предмета
+    std::string name;    // Отображаемое имя предмета
     std::string type;
     int costSteps;
     int costSlots;
@@ -130,7 +132,7 @@ struct GameData {
     };
 
     // ОБЪЯВЛЕНИЯ методов
-    const ItemData* findItem(const std::string& name) const;
+    const ItemData* findItem(const std::string& itemId) const;
     const SpellData* findSpell(const std::string& name) const;
     std::unique_ptr<BattleActionInfo> findBattleActionDetails(const PlayerStats& player, const std::string& actionDisplayName) const;
 };

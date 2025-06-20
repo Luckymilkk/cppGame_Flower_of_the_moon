@@ -128,6 +128,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="data_structures.cpp" />
+    <ClCompile Include="data\DataLoader.cpp" />
+    <ClCompile Include="domain\Action.cpp" />
+    <ClCompile Include="domain\ActionManager.cpp" />
+    <ClCompile Include="domain\Book.cpp" />
+    <ClCompile Include="domain\BookManager.cpp" />
+    <ClCompile Include="domain\Item.cpp" />
+    <ClCompile Include="domain\ItemManager.cpp" />
+    <ClCompile Include="domain\Monster.cpp" />
+    <ClCompile Include="domain\MonsterManager.cpp" />
+    <ClCompile Include="domain\Player.cpp" />
+    <ClCompile Include="domain\Spell.cpp" />
+    <ClCompile Include="domain\SpellManager.cpp" />
+    <ClCompile Include="engine\GameEngine.cpp" />
     <ClCompile Include="file_parser.cpp" />
     <ClCompile Include="Flower of the moon text game.cpp" />
     <ClCompile Include="utils.cpp" />
@@ -135,6 +148,18 @@
   <ItemGroup>
     <ClInclude Include="config.h" />
     <ClInclude Include="data_structures.h" />
+    <ClInclude Include="domain\Action.h" />
+    <ClInclude Include="domain\ActionManager.h" />
+    <ClInclude Include="domain\Book.h" />
+    <ClInclude Include="domain\BookManager.h" />
+    <ClInclude Include="domain\Item.h" />
+    <ClInclude Include="domain\ItemManager.h" />
+    <ClInclude Include="domain\Monster.h" />
+    <ClInclude Include="domain\MonsterManager.h" />
+    <ClInclude Include="domain\Player.h" />
+    <ClInclude Include="domain\Spell.h" />
+    <ClInclude Include="domain\SpellManager.h" />
+    <ClInclude Include="engine\GameEngine.h" />
     <ClInclude Include="file_parser.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>

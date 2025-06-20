@@ -1,72 +1,127 @@
-# Действия в фазе подготовки. Каждое действие "---"
-menuText:Прокачать ловкость
-costSteps:1
+# Действия подготовки
+---
+name:прокачать ловкость
+id:train_agility
+description:Увеличить ловкость на 1
+menuText:Прокачать ловкость (Шаги: 1)
 effectType:increase_stat
 targetStat:agility
 effectValue:1
 maxValue:3
-requiresMagicAccess:false # Не требует магии для прокачки
----
-menuText:Прокачать меткость
 costSteps:1
+requiresMagicAccess:false
+---
+name:прокачать меткость
+id:train_accuracy
+description:Увеличить меткость на 1
+menuText:Прокачать меткость (Шаги: 1)
 effectType:increase_stat
 targetStat:accuracy
 effectValue:1
 maxValue:3
+costSteps:1
 requiresMagicAccess:false
 ---
-menuText:Прокачать выносливость
-costSteps:1
+name:прокачать выносливость
+id:train_stamina
+description:Увеличить выносливость на 1
+menuText:Прокачать выносливость (Шаги: 1)
 effectType:increase_stat
 targetStat:stamina
 effectValue:1
 maxValue:3
+costSteps:1
 requiresMagicAccess:false
 ---
-menuText:Прокачать ум
-costSteps:1
+name:прокачать ум
+id:train_intelligence
+description:Увеличить ум на 1
+menuText:Прокачать ум (Шаги: 1)
 effectType:increase_stat
 targetStat:intelligence
 effectValue:1
 maxValue:3
+costSteps:1
 requiresMagicAccess:false
 ---
-menuText:Прокачать боевой опыт
-costSteps:1
+name:прокачать боевой опыт
+id:train_combat
+description:Увеличить боевой опыт на 1
+menuText:Прокачать боевой опыт (Шаги: 1)
 effectType:increase_stat
 targetStat:combatExperience
 effectValue:1
 maxValue:3
+costSteps:1
 requiresMagicAccess:false
 ---
-menuText:Восстановить доступ к магии
-costSteps:1
+name:восстановить магию
+id:restore_magic
+description:Восстановить доступ к магии
+menuText:Восстановить доступ к магии (Шаги: 1)
 effectType:enable_magic_access
-targetStat: # не используется для этого типа
-effectValue:0 # не используется
-maxValue:0 # не используется
-requiresMagicAccess:false # само действие дает доступ
----
-menuText:Прокачать контроль магии
 costSteps:1
+requiresMagicAccess:false
+---
+name:прокачать контроль магии
+id:train_magic_control
+description:Увеличить контроль магии на 1
+menuText:Прокачать контроль магии (Шаги: 1)
 effectType:increase_stat
 targetStat:magicControl
 effectValue:1
 maxValue:3
-requiresMagicAccess:true # Требует доступа к магии
----
-menuText:Прокачать магический опыт
 costSteps:1
+requiresMagicAccess:true
+---
+name:прокачать магический опыт
+id:train_magic_exp
+description:Увеличить магический опыт на 1
+menuText:Прокачать магический опыт (Шаги: 1)
 effectType:increase_stat
 targetStat:magicExperience
 effectValue:1
 maxValue:3
+costSteps:1
 requiresMagicAccess:true
 ---
-menuText:Прокачать психическую стабильность
-costSteps:1
+name:прокачать психическую стабильность
+id:train_psychic
+description:Увеличить психическую стабильность на 1
+menuText:Прокачать психическую стабильность (Шаги: 1)
 effectType:increase_stat
 targetStat:psychicStability
 effectValue:1
 maxValue:3
+costSteps:1
 requiresMagicAccess:true
+---
+name:прочитать книгу о волках
+id:read_wolf_book
+description:Прочитать книгу о волках
+menuText:Прочитать книгу о волках (Бесплатно)
+effectType:read_book
+bookKey:книга о волках
+costSteps:0
+requiresMagicAccess:false
+requiresBook:book_wolf
+---
+name:прочитать книгу о кентавре
+id:read_centaur_book
+description:Прочитать книгу о кентавре
+menuText:Прочитать книгу о кентавре (Бесплатно)
+effectType:read_book
+bookKey:книга о кентавре
+costSteps:0
+requiresMagicAccess:false
+requiresBook:book_centaur
+---
+name:прочитать книгу о грифоне
+id:read_griffin_book
+description:Прочитать книгу о грифоне
+menuText:Прочитать книгу о грифоне (Бесплатно)
+effectType:read_book
+bookKey:книга о грифоне
+costSteps:0
+requiresMagicAccess:false
+requiresBook:book_griffin

@@ -6,7 +6,7 @@
 #include <iostream> // Для сообщений об ошибках и отладки
 
 // Вспомогательная функция для парсинга строки формата "ключ: значение"
-bool parseKeyValue(const std::string& line, std::string& key, std::string& value) {
+static bool parseKeyValue(const std::string& line, std::string& key, std::string& value) {
     size_t delimiterPos = line.find(':');
     if (delimiterPos == std::string::npos) {
         return false; // Разделитель ':' не найден
@@ -18,6 +18,7 @@ bool parseKeyValue(const std::string& line, std::string& key, std::string& value
 
 bool loadPlayerStatsFromFile(PlayerStats& playerStats, const std::string& filename) {
     std::ifstream file(filename);
+    file.imbue(std::locale(std::locale(), new std::codecvt_utf8<char>));
 
     if (!file.is_open()) {
         std::cerr << "Ошибка: Не удалось открыть файл характеристик игрока: " << filename << std::endl;
@@ -58,6 +59,7 @@ bool loadPlayerStatsFromFile(PlayerStats& playerStats, const std::string& filena
 
 bool loadMonstersFromFile(std::vector<MonsterData>& monsters, const std::string& filename) {
     std::ifstream file(filename);
+    file.imbue(std::locale(std::locale(), new std::codecvt_utf8<char>));
     if (!file.is_open()) {
         std::cerr << "Ошибка: Не удалось открыть файл монстров: " << filename << std::endl;
         return false;
@@ -107,6 +109,7 @@ bool loadMonstersFromFile(std::vector<MonsterData>& monsters, const std::string&
 
 bool loadItemsFromFile(std::vector<ItemData>& items, const std::string& filename) {
     std::ifstream file(filename);
+    file.imbue(std::locale(std::locale(), new std::codecvt_utf8<char>));
     if (!file.is_open()) {
         std::cerr << "Ошибка: Не удалось открыть файл предметов: " << filename << std::endl;
         return false;
@@ -156,6 +159,7 @@ bool loadItemsFromFile(std::vector<ItemData>& items, const std::string& filename
 
 bool loadSpellsFromFile(std::vector<SpellData>& spells, const std::string& filename) {
     std::ifstream file(filename);
+    file.imbue(std::locale(std::locale(), new std::codecvt_utf8<char>));
     if (!file.is_open()) {
         std::cerr << "Ошибка: Не удалось открыть файл заклинаний: " << filename << std::endl;
         return false;
@@ -203,6 +207,7 @@ bool loadSpellsFromFile(std::vector<SpellData>& spells, const std::string& filen
 
 bool loadBooksFromFile(std::map<std::string, std::string>& bookContents, const std::string& filename) {
     std::ifstream file(filename);
+    file.imbue(std::locale(std::locale(), new std::codecvt_utf8<char>));
     if (!file.is_open()) {
         std::cerr << "Ошибка: Не удалось открыть файл книг: " << filename << std::endl;
         return false;
@@ -254,6 +259,7 @@ bool loadBooksFromFile(std::map<std::string, std::string>& bookContents, const s
 
 bool loadPreparationActionsFromFile(std::vector<PreparationActionData>& actions, const std::string& filename) {
     std::ifstream file(filename);
+    file.imbue(std::locale(std::locale(), new std::codecvt_utf8<char>));
     if (!file.is_open()) {
         std::cerr << "Ошибка: Не удалось открыть файл действий подготовки: " << filename << std::endl;
         return false;

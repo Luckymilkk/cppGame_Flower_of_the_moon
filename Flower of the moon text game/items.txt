@@ -1,32 +1,44 @@
 # Предметы. Каждый предмет отделяется строкой "---"
 # Книги (берутся в инвентарь, занимают слот, дают знание)
+---
+id:book_wolf
 name:книга о волках
 type:book
 costSteps:1
 costSlots:1
-bookKey:книга о волках # Этот ключ свяжет предмет с его описанием в books.txt и с монстром
+bookKey:книга о волках
+description:Книга о повадках волков
 ---
+id:book_centaur
 name:книга о кентавре
 type:book
 costSteps:1
 costSlots:1
 bookKey:книга о кентавре
+description:Книга о жизни кентавров
 ---
+id:book_griffin
 name:книга о грифоне
 type:book
 costSteps:1
 costSlots:1
 bookKey:книга о грифоне
+description:Книга о грифонах
 ---
 # Предметы для подготовки
+---
+id:bag
 name:сумка
 type:preparation_item
 costSteps:1
-costSlots:0 # Сумка не занимает слот, а ДОБАВЛЯЕТ
+costSlots:0
 prepEffectType:add_slots
 prepEffectValue:2
+description:Увеличивает количество слотов инвентаря
 ---
 # Оружие
+---
+id:sword
 name:меч
 type:weapon
 costSteps:1
@@ -34,26 +46,32 @@ costSlots:1
 battleActionName:удар мечом
 checkStat:agility
 damage:40
-usesPerBattle:0 # 0 означает бесконечное использование
+usesPerBattle:0
+description:Обычный меч
 ---
+id:axe
 name:топор
 type:weapon
 costSteps:1
 costSlots:1
 battleActionName:удар топором
-checkStat:agility # По фото из ТЗ - ловкость
+checkStat:agility
 damage:35
 usesPerBattle:0
+description:Тяжёлый топор
 ---
+id:whip
 name:кнут
 type:weapon
 costSteps:1
 costSlots:1
 battleActionName:удар кнутом
-checkStat:accuracy # По фото из ТЗ - меткость
+checkStat:accuracy
 damage:40
 usesPerBattle:0
+description:Кожаный кнут
 ---
+id:rifle
 name:ружье
 type:weapon
 costSteps:1
@@ -61,8 +79,10 @@ costSlots:1
 battleActionName:выстрел из ружья
 checkStat:accuracy
 damage:40
-usesPerBattle:2 # Можно использовать 2 раза за бой
+usesPerBattle:2
+description:Огнестрельное оружие
 ---
+id:bow
 name:лук и стрелы
 type:weapon
 costSteps:2
@@ -71,8 +91,10 @@ battleActionName:выстрел из лука
 checkStat:accuracy
 damage:50
 usesPerBattle:0
+description:Дальний бой
 ---
-name:knife
+id:knife
+name:нож
 type:weapon
 costSteps:1
 costSlots:1
@@ -80,3 +102,4 @@ battleActionName:удар ножом
 checkStat:combatExperience
 damage:15
 usesPerBattle:0
+description:Обычный нож

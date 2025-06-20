@@ -1,26 +1,32 @@
 # Монстры. Каждый монстр отделяется строкой "---"
-name:Волк
-hp:150
-damageToPlayer:1
-bookKey:книга о волках
+name:волк
+health:150
+attack:1
+defense:0
+successActions:ослепление,выстрел из ружья,магический луч
+failActions:удар рукой,маскировка,бегство
+bookKey:book_wolf
 # Действия игрока через запятую
 favorableActions:ослепление,выстрел из ружья,магический луч
 unfavorableActions:удар рукой,маскировка,бегство
 neutralActions:
 ---
-name:Кентавр
-hp:450
-damageToPlayer:1
-bookKey:книга о кентавре
-favorableActions:бегство,маскировка,приручение
-unfavorableActions: # Пусто, т.к. используется specialRule
+name:кентавр
+health:450
+attack:1
+defense:0
+successActions:бегство,маскировка,приручение
+failActions:удар мечом,выстрел из лука,выстрел из ружья,удар кнутом,удар ножом,удар топором,удар рукой,магический луч
 neutralActions:ослепление
 specialRule:AllOthersUnfavorable # Все остальные действия, не указанные как удачные или нейтральные, будут провальными
 ---
-name:Грифон
-hp:350
-damageToPlayer:1
-bookKey:книга о грифоне
+name:грифон
+health:350
+attack:1
+defense:0
+successActions:удар мечом,выстрел из лука,выстрел из ружья,ослепление
+failActions:удар рукой,бегство
+bookKey:book_griffin
 favorableActions:удар мечом,выстрел из лука,выстрел из ружья,ослепление
 unfavorableActions:удар рукой,бегство
 neutralActions:

@@ -21,61 +21,48 @@ PreparationActionData::PreparationActionData() : costSteps(0), effectValue(0), m
 
 
 // --- Реализации методов PlayerStats ---
-void PlayerStats::displayStats() const {
-    std::cout << "\n--- Характеристики Героя ---" << std::endl;
+void PlayerStats::displayStats(const domain::ItemManager& itemManager) const {
+    std::cout << "\n=== СТАТИСТИКА ИГРОКА ===" << std::endl;
     std::cout << "Здоровье: " << hp << "/" << maxHp << std::endl;
-    std::cout << "Шаги для подготовки: " << steps << std::endl;
-    std::cout << "Слоты инвентаря: " << inventory.size() << "/" << inventorySlots << " (фактическое кол-во предметов / макс. слотов)" << std::endl;
-    std::cout << "Попытки: " << attempts << std::endl;
-    std::cout << "Ловкость: " << agility << "/3" << std::endl;
-    std::cout << "Меткость: " << accuracy << "/3" << std::endl;
-    std::cout << "Выносливость: " << stamina << "/3" << std::endl;
-    std::cout << "Ум: " << intelligence << "/3" << std::endl;
-    std::cout << "Боевой опыт: " << combatExperience << "/3" << std::endl;
-    std::cout << "Доступ к магии: " << (magicAccess ? "Есть" : "Нет") << std::endl;
     if (magicAccess) {
-        std::cout << "Запас магии: " << magicReserve << "/" << maxMagicReserve << std::endl;
-        std::cout << "Контроль магии: " << magicControl << "/3" << std::endl;
-        std::cout << "Магический опыт: " << magicExperience << "/3" << std::endl;
-        std::cout << "Психическая стабильность: " << psychicStability << "/3" << std::endl;
+        std::cout << "Магический резерв: " << magicReserve << "/" << maxMagicReserve << std::endl;
     }
-    std::cout << "Инвентарь: ";
+    std::cout << "Боевой опыт: " << combatExperience << std::endl;
+    std::cout << "Выносливость: " << stamina << std::endl;
+    std::cout << "Ум: " << intelligence << std::endl;
+    std::cout << "\nИнвентарь:" << std::endl;
     if (inventory.empty()) {
-        std::cout << "пусто";
+        std::cout << "Пусто" << std::endl;
     }
     else {
-        for (size_t i = 0; i < inventory.size(); ++i) {
-            std::cout << inventory[i] << (i == inventory.size() - 1 ? "" : ", ");
+        for (const auto& itemId : inventory) {
+            const auto* item = itemManager.getItem(itemId);
+            if (item) {
+                std::cout << "- " << item->name << std::endl;
+            }
         }
     }
-    std::cout << std::endl;
-    std::cout << "Изученные заклинания: ";
+    std::cout << "\nИзвестные заклинания:" << std::endl;
     if (knownSpells.empty()) {
-        std::cout << "нет";
+        std::cout << "Нет" << std::endl;
     }
     else {
-        for (size_t i = 0; i < knownSpells.size(); ++i) {
-            std::cout << knownSpells[i] << (i == knownSpells.size() - 1 ? "" : ", ");
+        for (const auto& spell : knownSpells) {
+            std::cout << "- " << spell << std::endl;
         }
     }
-    std::cout << std::endl;
-    std::cout << "Прочитанные книги: ";
-    bool firstBook = true;
-    for (const auto& pair : booksActuallyRead) {
-        if (pair.second) { // Если книга была отмечена как прочитанная
-            if (!firstBook) std::cout << ", ";
-            std::cout << pair.first; // Отображаем ключ книги (который должен быть ее названием из items.txt)
-            firstBook = false;
-        }
-    }
-    if (firstBook) std::cout << "нет";
-    std::cout << std::endl;
-    std::cout << "--------------------------" << std::endl;
+    std::cout << "=========================" << std::endl;
 }
 
 void PlayerStats::resetForNewAttempt(const PlayerStats& initialConfig) {
-    hp = maxHp;
-    magicReserve = maxMagicReserve;
+    // Восстанавливаем HP и ману до ИЗНАЧАЛЬНЫХ максимальных значений
+    hp = initialConfig.maxHp;
+    maxHp = initialConfig.maxHp;
+    magicReserve = initialConfig.maxMagicReserve;
+    maxMagicReserve = initialConfig.maxMagicReserve;
+
+    // Также сбрасываем временные боевые состояния
+    rifleUsesPerBattle = 0;
 }
 
 bool PlayerStats::hasItem(const std::string& itemName) const {
@@ -133,9 +120,11 @@ void MonsterData::resetHp() {
 }
 
 // --- Реализации методов GameData ---
-const ItemData* GameData::findItem(const std::string& name) const {
+const ItemData* GameData::findItem(const std::string& itemId) const {
     for (const auto& item : items) {
-        if (item.name == name) return &item;
+        if (item.id == itemId) {
+            return &item;
+        }
     }
     return nullptr;
 }
@@ -149,8 +138,8 @@ const SpellData* GameData::findSpell(const std::string& name) const {
 
 std::unique_ptr<GameData::BattleActionInfo> GameData::findBattleActionDetails(const PlayerStats& player, const std::string& actionDisplayName) const {
     // Поиск среди оружия в инвентаре
-    for (const auto& itemName : player.inventory) {
-        const ItemData* item = findItem(itemName); // Используем this->findItem
+    for (const auto& itemId : player.inventory) {
+        const ItemData* item = findItem(itemId);
         if (item && item->type == "weapon" && item->battleActionName == actionDisplayName) {
             auto info = std::make_unique<BattleActionInfo>();
             info->name = item->battleActionName;

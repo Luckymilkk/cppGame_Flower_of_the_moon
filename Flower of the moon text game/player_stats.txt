@@ -1,9 +1,17 @@
-﻿# Начальные характеристики игрока
-hp:5
-maxHp:5
+# Начальные характеристики игрока
+name:Герой
+health:5
+maxHealth:5
+mana:2
+magicReserve:2
+maxMagicReserve:2
+experience:0
+level:1
 steps:15
 inventorySlots:5
 attempts:3
+magicAccess:false
+# Характеристики
 agility:2
 accuracy:0
 stamina:1
@@ -12,6 +20,3 @@ combatExperience:2
 magicControl:2
 magicExperience:0
 psychicStability:0
-magicAccess:false
-magicReserve:2
-maxMagicReserve:2
