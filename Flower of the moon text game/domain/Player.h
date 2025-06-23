@@ -35,7 +35,6 @@ public:
     int magic_experience;
     int psychic_stability;
 
-    std::unordered_map<std::string, int> stats;
     std::vector<std::string> inventory;
     std::vector<std::string> known_spells;
     std::map<std::string, bool> books_actually_read;

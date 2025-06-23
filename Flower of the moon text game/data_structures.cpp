@@ -57,7 +57,6 @@ bool PlayerStats::KnowsSpell(const std::string& spell_name) const {
     return std::find(known_spells.begin(), known_spells.end(), spell_name) != known_spells.end();
 }
 
-// --- MonsterData ---
 MonsterData::MonsterData() = default;
 
 void MonsterData::DisplayInfo(const domain::Player& player, const domain::BookManager& book_manager) const {
@@ -103,16 +102,12 @@ void MonsterData::ResetHp() {
     current_hp = initial_hp;
 }
 
-// --- ItemData ---
 ItemData::ItemData() = default;
 
-// --- SpellData ---
 SpellData::SpellData() = default;
 
-// --- PreparationActionData ---
 PreparationActionData::PreparationActionData() = default;
 
-// --- GameData ---
 const ItemData* GameData::FindItem(const std::string& item_id) const {
     for (const auto& item : items) {
         if (item.id == item_id) {

@@ -9,16 +9,13 @@
 #include "domain/BookManager.h"
 #include "domain/Player.h"
 #include "domain/Action.h"
-// НЕ НУЖНЫ здесь: <iostream>, <iomanip>, <algorithm> для реализаций, они уйдут в .cpp
 
-/**
- * @brief Player statistics and inventory.
- */
+
 struct PlayerStats {
-    int hp = 100;
-    int max_hp = 100;
-    int steps = 10;
-    int inventory_slots = 3;
+    int hp = 5;
+    int max_hp = 5;
+    int steps = 15;
+    int inventory_slots = 5;
     int attempts = 0;
 
     int agility = 0;
@@ -31,8 +28,8 @@ struct PlayerStats {
     int psychic_stability = 0;
 
     bool magic_access = false;
-    int magic_reserve = 50;
-    int max_magic_reserve = 50;
+    int magic_reserve = 2;
+    int max_magic_reserve = 2;
 
     std::vector<std::string> inventory;
     std::vector<std::string> known_spells;
@@ -46,9 +43,6 @@ struct PlayerStats {
     bool KnowsSpell(const std::string& spell_name) const;
 };
 
-/**
- * @brief Monster data and battle properties.
- */
 struct MonsterData {
     std::string id;
     std::string name;
@@ -69,9 +63,6 @@ struct MonsterData {
     void ResetHp();
 };
 
-/**
- * @brief Item data and properties.
- */
 struct ItemData {
     std::string id;
     std::string name;
@@ -89,9 +80,6 @@ struct ItemData {
     ItemData();
 };
 
-/**
- * @brief Spell data and properties.
- */
 struct SpellData {
     std::string name;
     std::string type;
@@ -107,9 +95,6 @@ struct SpellData {
     SpellData();
 };
 
-/**
- * @brief Preparation action data and properties.
- */
 struct PreparationActionData {
     std::string menu_text;
     int cost_steps = 0;
@@ -124,9 +109,6 @@ struct PreparationActionData {
     PreparationActionData();
 };
 
-/**
- * @brief Game data container.
- */
 struct GameData {
     PlayerStats initial_player_stats;
     std::vector<MonsterData> monsters;
@@ -152,4 +134,4 @@ struct GameData {
     std::unique_ptr<BattleActionInfo> FindBattleActionDetails(const PlayerStats& player, const std::string& action_display_name) const;
 };
 
-#endif  // DATA_STRUCTURES_H_
+#endif 

@@ -7,11 +7,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Flower of the moon text gam
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решения", "Элементы решения", "{754FC069-D67B-A9D7-50A1-8D1CA196D8F1}"
 	ProjectSection(SolutionItems) = preProject
+		books.txt = books.txt
 		data\DataLoader.cpp = data\DataLoader.cpp
 		data\DataLoader.h = data\DataLoader.h
 		engine\GameEngine.cpp = engine\GameEngine.cpp
 		engine\GameEngine.h = engine\GameEngine.h
 		main.cpp = main.cpp
+		monsters.txt = monsters.txt
+		player_stats.txt = player_stats.txt
+		preparation_actions.txt = preparation_actions.txt
+		spells.txt = spells.txt
 	EndProjectSection
 EndProject
 Global

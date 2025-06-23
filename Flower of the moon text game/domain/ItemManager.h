@@ -18,6 +18,6 @@ private:
     std::unordered_map<std::string, Item> items_;
 };
 
-} // namespace domain
+} 
 
-#endif  // DOMAIN_ITEM_MANAGER_H_
+#endif  

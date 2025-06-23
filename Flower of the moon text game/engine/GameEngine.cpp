@@ -40,14 +40,14 @@ GameEngine::GameEngine() {
 }
 
 void GameEngine::Run() {
-    std::cout << "Добро пожаловать в игру!" << std::endl;
+    std::cout << "Добро пожаловать! вы в деревне эльфов! Ваша задача подготовиться к сражению и защитить ее от монстров!" << std::endl;
     int attempts = 3;
-    domain::Player initial_player_state = *player_; // Сохраняем начальное состояние
+    domain::Player initial_player_state = *player_; 
 
     while (attempts > 0) {
-        *player_ = initial_player_state; // Сброс к начальному состоянию
-        player_->health = player_->max_health; // Восстанавливаем здоровье до максимума
-        player_->mana = player_->magic_reserve;   // Восстанавливаем ману до максимума
+        *player_ = initial_player_state; 
+        player_->health = player_->max_health; 
+        player_->mana = player_->magic_reserve;   
         player_->attempts = attempts;
         std::cout << "\n--- ПОПЫТКА " << (4 - attempts) << "/3 ---" << std::endl;
         
@@ -105,7 +105,6 @@ void GameEngine::PreparationPhase() {
                 std::cout << menuOption << ". Прочитать '" << book_opt.name << "' (Шаги: 0)" << std::endl;
                 actions.push_back([this, book_opt](bool& done) {
                     player_->books_actually_read[book_opt.id] = true;
-                    // player_->steps -= 0; // Шаги не тратятся
                     const auto& book_content = book_manager_.GetBook(book_opt.id);
                     if (book_content) {
                         std::cout << "\n=== " << book_content->title << " ===" << std::endl;
@@ -240,7 +239,6 @@ void GameEngine::PreparationPhase() {
     std::cout << "--- ПОДГОТОВКА ЗАВЕРШЕНА ---" << std::endl;
 }
 
-// Новая структура для описания боевого действия
 struct BattleAction {
     std::string name;
     std::string check_stat;
@@ -309,7 +307,7 @@ bool GameEngine::BattlePhase() {
             std::vector<BattleAction> available_actions;
             std::cout << "\nВыберите действие:" << std::endl;
             int menu_idx = 1;
-            for (const auto& action : all_actions) {
+            for (const auto& action : all_actions) { //определение доступных действий
                 if (action.requirement(*player_)) {
                     std::cout << menu_idx << ". " << action.name << " (Проверка: " << action.check_stat << ")" << std::endl;
                     available_actions.push_back(action);
@@ -330,7 +328,7 @@ bool GameEngine::BattlePhase() {
             } else if (std::abs(result - 1.5) < 1e-9) { // Сравнение double чисел
                 std::cout << "Нейтрально. ";
                 success = true; 
-            } else { // result < 1.5
+            } else { 
                 std::cout << "Провал... ";
                 success = false;
             }
@@ -349,7 +347,6 @@ bool GameEngine::BattlePhase() {
                 }
             }
 
-            // Монстр атакует при провале или нейтральном результате, если он еще жив
             if ((!success || std::abs(result - 1.5) < 1e-9) && current_monster.current_hp > 0) {
                 std::cout << "Монстр атакует в ответ!" << std::endl;
                 player_->TakeDamage(1);
@@ -359,21 +356,19 @@ bool GameEngine::BattlePhase() {
         if (player_->health > 0) {
             std::cout << "\n*** Вы победили " << current_monster.name << "! ***" << std::endl;
             monstersDefeated++;
-        } else {
+        } 
+        else {
             std::cout << "\nВы были побеждены..." << std::endl;
-            // Логика попыток будет здесь
             break;
         }
     }
 
     if (monstersDefeated >= 3) {
-        std::cout << "\n\n*** ПОЗДРАВЛЯЕМ! ВЫ ПРОШЛИ ИГРУ! ***" << std::endl;
+        std::cout << "\n\n*** ПОЗДРАВЛЯЕМ! Вы прошли игру и спасли деревню эльфов! ***" << std::endl;
         return true; // Победа
-    } else if (player_->health > 0) {
-        std::cout << "\n\nВы не смогли победить всех монстров. Попробуйте снова!" << std::endl;
-        return false; // Поражение
-    } else {
-        std::cout << "\n\n--- ИГРА ОКОНЧЕНА ---" << std::endl;
+    } 
+    else {
+        std::cout << "\n\n--- Игра ОКОНЧЕНА вы были изгнаны из деревни ---" << std::endl;
         return false; // Поражение
     }
 }

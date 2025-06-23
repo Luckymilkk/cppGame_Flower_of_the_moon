@@ -18,8 +18,8 @@ struct Action {
     int costSteps = 0;
     bool requiresMagicAccess = false;
     std::unordered_map<std::string, int> effects;
-    // Методы для выполнения действия
+
     void execute() const;
 };
 
-} // namespace domain 
+}

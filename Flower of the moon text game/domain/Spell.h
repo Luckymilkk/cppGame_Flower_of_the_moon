@@ -13,7 +13,7 @@ struct Spell {
     bool requiresMagicAccessToLearn = false;
     int manaCost = 0;
     std::unordered_map<std::string, int> effects;
-    // Методы для использования заклинания
+    
     void cast();
 };
 

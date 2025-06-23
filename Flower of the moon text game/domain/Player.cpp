@@ -6,11 +6,11 @@
 namespace domain {
 
 Player::Player()
-    : health(100),
-      max_health(100),
-      mana(50),
-      magic_reserve(50),
-      max_magic_reserve(50),
+    : health(5),
+      max_health(5),
+      mana(2),
+      magic_reserve(2),
+      max_magic_reserve(2),
       experience(0),
       level(1),
       steps(15),

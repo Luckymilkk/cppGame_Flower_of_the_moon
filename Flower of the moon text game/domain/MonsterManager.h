@@ -17,6 +17,5 @@ private:
     std::unordered_map<std::string, Monster> monsters_;
 };
 
-} // namespace domain 
-
+} 
 #endif  // DOMAIN_MONSTER_MANAGER_H_ 

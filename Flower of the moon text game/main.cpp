@@ -1,20 +1,19 @@
-﻿#define NOMINMAX // Для Windows, чтобы избежать конфликтов min/max макросов
+﻿#define NOMINMAX 
 #include <iostream>
 #include <vector>
 #include <string>
 #include <limits>
 #include <locale>
-#include <stdexcept> // Для std::exception
+#include <stdexcept> 
 
 #if defined(_WIN32) || defined(_WIN64)
-#include <windows.h> // Для установки кодировки консоли Windows
+#include <windows.h> 
 #endif
 
 #include "engine/GameEngine.h"
 
 int main() {
     #if defined(_WIN32) || defined(_WIN64)
-    // Устанавливаем кодовые страницы для корректного отображения UTF-8 в консоли Windows
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
     #endif
